@@ -6,6 +6,14 @@ function Sprite.Create(_filePath, _xPos, _yPos)
   Sprite.YPos = _yPos;
 end
 
+function Sprite:GetWidth()
+  return Sprite.Image:getWidth();
+end
+
+function Sprite:GetHeight()
+  return Sprite.Image:getHeight();
+end
+
 function Sprite.Draw()
   love.graphics.draw(Sprite.Image,
   Sprite.XPos,
@@ -15,7 +23,6 @@ function Sprite.Draw()
   0.5,
   Sprite.Image:getWidth()/2,
   Sprite.Image:getHeight()/2);
-
 end
 
 return Sprite;

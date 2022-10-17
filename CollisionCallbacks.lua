@@ -1,5 +1,5 @@
 function BeginContact(_bodyA, _bodyB, _collision)
-
+  
 end
 
 function EndContact(_bodyA, _bodyB, _collision)

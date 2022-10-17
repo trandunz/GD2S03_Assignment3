@@ -1,23 +1,21 @@
-Text = require("Text");
-Player = require("Player");
-require("World");
+LevelOne = require("Scene"):new();
 
 function love.load(arg)
   love.window.setMode(800, 800);
 
-  InitWorld();
+  --sti = require("sti");
+  --map = sti("Resources/Tilemaps/ExampleTimemap.lua");
 
-  Player.Create(love.graphics.getWidth()/2, love.graphics.getHeight()/2);
-  Text.Create("Yay!");
+  LevelOne:Start();
 end
 
 function love.update(dt)
-  world:update(dt);
-  Player.GrabInput();
-  Player.Update(dt);
+  LevelOne:Update(dt);
+
+  --map:update(dt);
 end
 
 function love.draw()
-  Player.Draw();
-  Text.Draw();
+  LevelOne:Draw();
+  --map:drawLayer(map.layers["Tile Layer 1"]);
 end

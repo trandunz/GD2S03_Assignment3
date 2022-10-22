@@ -1,4 +1,4 @@
-Vec2 = {x = 0.0, y = 0.0};
+local Vec2 = {x = 0.0, y = 0.0};
 
 function Vec2:new(_vec2)
   _vec2 = _vec2 or {};

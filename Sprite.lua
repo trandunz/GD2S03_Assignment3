@@ -13,6 +13,13 @@ function Sprite:Create(_filePath, _xPos, _yPos)
   self.YPos = _yPos;
 end
 
+function Sprite:GetPosition()
+  local pos = require("Vec2"):new();
+  pos.x = self.XPos;
+  pos.y = self.YPos;
+  return pos;
+end
+
 function Sprite:SetScale(_x, _y)
   self.XScale = _x;
   self.YScale = _y;
@@ -30,6 +37,10 @@ end
 
 function Sprite:GetHeight()
   return self.Image:getHeight();
+end
+
+function Sprite:SetImage(_file)
+  self.Image = love.graphics.newImage(_file);
 end
 
 function Sprite:Draw()

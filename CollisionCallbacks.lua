@@ -15,18 +15,39 @@ function BeginContact(_fixtureA, _fixtureB, _collision)
       projectile.Destroy = true;
   end
 
-  if _fixtureA:getUserData() == "projectile" and _fixtureB:getUserData() == "enemy" then
+  if _fixtureA:getUserData() == "projectile" then
     local projectile = _fixtureA:getBody():getUserData();
-    local enemy = _fixtureB:getBody():getUserData();
-    enemy:TakeDamage(projectile.Damage);
-    projectile.Destroy = true;
-    return;
-  elseif _fixtureB:getUserData() == "projectile" and _fixtureA:getUserData() == "enemy" then
+
+    if _fixtureB:getUserData() == "enemy" then
+      if projectile.IsFriendly == true then
+        local enemy = _fixtureB:getBody():getUserData();
+        enemy:TakeDamage(projectile.Damage);
+        projectile.Destroy = true;
+      end
+    elseif _fixtureB:getUserData() == "player" then
+      if projectile.IsFriendly == false then
+        Player.TakeDamage(projectile.Damage);
+        projectile.Destroy = true;
+      end
+    end
+
+  elseif _fixtureB:getUserData() == "projectile" then
     local projectile = _fixtureB:getBody():getUserData();
-    local enemy = _fixtureA:getBody():getUserData();
-    enemy:TakeDamage(projectile.Damage);
-    projectile.Destroy = true;
+
+    if _fixtureA:getUserData() == "enemy" then
+      if projectile.IsFriendly == true then
+        local enemy = _fixtureA:getBody():getUserData();
+        enemy:TakeDamage(projectile.Damage);
+        projectile.Destroy = true;
+      end
+    elseif _fixtureA:getUserData() == "player" then
+      if projectile.IsFriendly == false then
+        Player.TakeDamage(projectile.Damage);
+        projectile.Destroy = true;
+      end
+    end
   end
+
 end
 
 function EndContact(_fixtureA, _fixtureB, _collision)

@@ -1,7 +1,12 @@
-local Player = {Sprite = require("AnimatedSprite"):new(), MoveSpeed = 20, JumpHeight = 3500, MoveInput = require("Vec2"):new(), RigidBody = require("RigidBody"):new(), IsGrounded = false, DashDuration = 0.34, DashTimer = 0, DashSpeed = 50, IsCrouched = false,
-CrouchDuration = 0.28, CrouchTimer = 0, ShootDuration = 0.24, ShootTimer = 0};
+local Player = {Sprite, MoveSpeed = 20, JumpHeight = 3500, MoveInput, RigidBody, IsGrounded = false, DashDuration = 0.34, DashTimer = 0, DashSpeed = 50, IsCrouched = false,
+CrouchDuration = 0.28, CrouchTimer = 0, ShootDuration = 0.24, ShootTimer = 0, Health = 3};
 
 function Player.Create(_xPos, _yPos, _world)
+  Player.Sprite = require("AnimatedSprite"):new();
+  Player.MoveInput = require("Vec2"):new();
+  Player.RigidBody = require("RigidBody"):new();
+  Player.Health = 3;
+
   Player.Sprite:Create("Resources/Textures/Player_Shoot.png", _xPos, _yPos, 326 ,169);
   Player.Sprite:AddAnimation('1-9', 0.059);
   Player.Sprite:AddAnimation('10-25', 0.04);
@@ -14,7 +19,7 @@ function Player.Create(_xPos, _yPos, _world)
   Player.Sprite.CurrentAnimation = 1;
 
   Player.RigidBody:SetWorld(_world);
-  Player.RigidBody:CreateCube(_xPos, _yPos, Player.Sprite.xFrameSize - 230, Player.Sprite.yFrameSize - 50, "dynamic", 0, "player", 0, 15, self);
+  Player.RigidBody:CreateCube(_xPos, _yPos, Player.Sprite.xFrameSize - 230, Player.Sprite.yFrameSize - 50, "dynamic", 0, "player", 0, 15, false, self);
   Player.RigidBody:SetFixedToRotation(true);
 end
 
@@ -65,6 +70,16 @@ function Player.KeyEvents( key, scancode, isrepeat )
   end
   if key == "space" and Player.DashTimer <= 0 then
     Player.Dash();
+  end
+end
+
+function Player.TakeDamage(_amount)
+  if Player.Health > 0 then
+    Player.Health = Player.Health - _amount;
+
+    if Player.Health < 0 then
+      Player.Health = 0;
+    end
   end
 end
 
@@ -131,6 +146,10 @@ end
 
 function Player.ApplyLinearImpulse(_x, _y)
   Player.RigidBody:ApplyLinearImpulse(_x, _y);
+end
+
+function Player.GetPosition()
+  return Player.Sprite:GetPosition();
 end
 
 function Player.Dash()

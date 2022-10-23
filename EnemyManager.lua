@@ -16,6 +16,14 @@ function EnemyManager.Update(_dt)
   end
 end
 
+function EnemyManager.ForceCleanup()
+  for i, v in pairs(EnemyManager.Enemies) do
+    EnemyManager.Enemies[i]:Cleanup();
+    EnemyManager.Enemies[i] = nil;
+  end
+  collectgarbage("collect");
+end
+
 function EnemyManager.CleanupDestroyedEnemies()
   for i, v in pairs(EnemyManager.Enemies) do
     if EnemyManager.Enemies[i].Destroy == true then
@@ -24,6 +32,7 @@ function EnemyManager.CleanupDestroyedEnemies()
       EnemyManager.Enemies[i] = nil;
     end
   end
+  collectgarbage("collect");
 end
 
 function EnemyManager.Draw()

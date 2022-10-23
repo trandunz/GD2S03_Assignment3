@@ -7,16 +7,22 @@ function Projectile:new(_projectile)
   return _projectile;
 end
 
-function Projectile:Create(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _friendly, _damage)
+function Projectile:Create(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _friendly, _damage, _type)
   self.IsFriendly = _friendly;
   self.Speed = _speed;
   self.Direction.x = _DirectionX;
   self.Direction.y = _DirectionY;
   self.Direction:Normalize();
   self.Damage = _damage;
+  _type = _type or "PeaShooter";
 
-  self.Sprite:Create("Resources/Textures/PeaShooter.png", _xPos, _yPos, 158 ,47);
-  self.Sprite:AddAnimation('1-14', 0.05);
+  if _type == "Seed" then
+    self.Sprite:Create("Resources/Textures/Lober/Seed.png", _xPos, _yPos, 70 ,73);
+    self.Sprite:AddAnimation('1-8', 0.05);
+  elseif _type == "PeaShooter" then
+    self.Sprite:Create("Resources/Textures/PeaShooter.png", _xPos, _yPos, 158 ,47);
+    self.Sprite:AddAnimation('1-14', 0.05);
+  end
   self.Sprite.CurrentAnimation = 1;
 
   self.RigidBody:SetWorld(_world);
@@ -29,10 +35,14 @@ function Projectile:Update(_dt)
   if self.Destroy == false then
     self.Sprite.XPos = self.RigidBody:GetPosition().x;
     self.Sprite.YPos = self.RigidBody:GetPosition().y;
-    self.Sprite:SetScale(self.Direction.x, 1);
+
+    if self.Direction.x < 0 then
+      self.Sprite:SetScale(-1, 1);
+    end
+
     self.Sprite:Update(_dt);
 
-    self.RigidBody:SetVelocity(self.Direction.x * self.Speed, 0);
+    self.RigidBody:SetVelocity(self.Direction.x * self.Speed, self.Direction.y * self.Speed);
   end
 end
 

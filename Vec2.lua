@@ -9,9 +9,12 @@ end
 
 function Vec2:Normalize()
   if self:Mag() ~= 0.0 then
-    self.x = self.x / self:Mag();
-    self.y = self.y / self:Mag();
+    mag = self:Mag();
+    self.x = self.x / mag;
+    self.y = self.y / mag;
   end
+
+  return self;
 end
 
 function Vec2:Mag()
@@ -19,14 +22,21 @@ function Vec2:Mag()
 end
 
 function Vec2.__add(_vec1, _vec2)
-  output = Vec2:new();
+  local output = Vec2:new();
   output.x = _vec1.x + _vec2.x;
   output.y = _vec1.y + _vec2.y;
   return output;
 end
 
+function Vec2.__sub(_vec1, _vec2)
+  local output = Vec2:new();
+  output.x = _vec1.x - _vec2.x;
+  output.y = _vec1.y - _vec2.y;
+  return output;
+end
+
 function Vec2.__mul(_vec1, _factor)
-  output = Vec2:new();
+  local output = Vec2:new();
   output.x = _vec1.x * _factor;
   output.y = _vec1.y * _factor;
   return output;

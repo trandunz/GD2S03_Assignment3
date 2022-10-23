@@ -10,7 +10,7 @@ end
 
 function World:InitWorld()
   love.physics.setMeter(64);
-  self.world = love.physics.newWorld(0, 40 * love.physics.getMeter() , true);
+  self.world = love.physics.newWorld(0, 40 * love.physics.getMeter(), true);
   self.world:setCallbacks(BeginContact, EndContact, PreSolve, PostSolve);
 end
 

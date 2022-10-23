@@ -7,12 +7,17 @@ function MainMenu:new(_mainMenu)
   return _mainMenu;
 end
 
+function MainMenu:Cleanup()
+end
+
 function MainMenu:Start()
-    self.Play:Create("Resources/Textures/Start.png", WindowSize.x/2, (WindowSize.y/2) - 50);
+    AudioManager.CreateSound("Music", "Resources/Music/LastCourse.mp3", true, true, "stream");
+
+    self.Play:Create("Resources/Textures/GUI/Start.png", WindowSize.x/2, (WindowSize.y/2) - 50);
     self.Play:SetColor(255,255,255);
-    self.Options:Create("Resources/Textures/Options.png", WindowSize.x/2, WindowSize.y/2);
+    self.Options:Create("Resources/Textures/GUI/Options.png", WindowSize.x/2, WindowSize.y/2);
     self.Options:SetColor(150,150,150);
-    self.Exit:Create("Resources/Textures/Exit.png", WindowSize.x/2, (WindowSize.y/2) + 50);
+    self.Exit:Create("Resources/Textures/GUI/Exit.png", WindowSize.x/2, (WindowSize.y/2) + 50);
     self.Exit:SetColor(150,150,150);
 
     self.BG:Create("Resources/Textures/MM.png", WindowSize.x/2, WindowSize.y/2);

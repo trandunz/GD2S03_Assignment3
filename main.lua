@@ -1,23 +1,24 @@
 LevelLoader = require("LevelLoader");
 local Framebuffer = require("FrameBuffer");
+Math = require("Math");
 WindowSize = require("Vec2"):new();
-DebugDraw = true;
+DebugDraw = false;
+TimeScale = 1;
+AudioManager = require("AudioManager");
 
 function love.load(arg)
   WindowSize.x = 1280;
   WindowSize.y = 720;
   love.window.setMode(WindowSize.x, WindowSize.y);
 
-  --sti = require("sti");
-  --map = sti("Resources/Tilemaps/ExampleTimemap.lua");
   Framebuffer:InitFrameBuffer();
   LevelLoader:Start();
 end
 
 function love.update(dt)
-  LevelLoader:UpdateLevel(dt);
-  LevelLoader:LoadIfPending(dt);
-  --map:update(dt);
+  local deltaTime = dt * TimeScale;
+  LevelLoader:UpdateLevel(deltaTime);
+  LevelLoader:LoadIfPending(deltaTime);
 end
 
 function love.keypressed( key, scancode, isrepeat )
@@ -28,5 +29,4 @@ function love.draw()
   Framebuffer:Bind();
   LevelLoader:DrawLevel();
   Framebuffer:UnBind();
-  --map:drawLayer(map.layers["Tile Layer 1"]);
 end

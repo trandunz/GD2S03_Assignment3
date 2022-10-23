@@ -41,6 +41,13 @@ function AnimatedSprite:GetHeight()
   return self.Image:getHeight();
 end
 
+function AnimatedSprite:GetPosition()
+  local pos = require("Vec2"):new();
+  pos.x = self.XPos;
+  pos.y = self.YPos;
+  return pos;
+end
+
 function AnimatedSprite:Update(_dt)
   for i=1, self.NumerOfAnimations do
     if self.CurrentAnimation ~= i then

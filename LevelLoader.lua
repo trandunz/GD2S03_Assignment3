@@ -45,7 +45,10 @@ function LevelLoader:LoadIfPending(_dt)
   if LevelLoader.pendingChange == true then
     if LevelLoader.transitionRatio > 1.0 then
       LevelLoader.transitionRatio = 0.0;
-      table.remove(LevelLoader, 1)
+      LevelLoader.currentLevel:Cleanup();
+      LevelLoader.currentLevel = nil;
+      AudioManager.ForceCleanup();
+      collectgarbage("collect");
       LevelLoader.currentLevel = require(LevelLoader.levelToLoad):new();
       LevelLoader.currentLevel:Start();
       LevelLoader.pendingChange = false;

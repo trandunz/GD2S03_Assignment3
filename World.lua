@@ -1,8 +1,8 @@
-local World = {world};
+local World = {};
 require("CollisionCallbacks");
 
 function World:new(_world)
-  _world = _world or {};
+  _world = _world or {world};
   setmetatable(_world, self);
   self.__index = self;
   return _world;

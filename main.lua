@@ -1,8 +1,12 @@
 LevelLoader = require("LevelLoader");
 local Framebuffer = require("FrameBuffer");
+WindowSize = require("Vec2"):new();
+DebugDraw = true;
 
 function love.load(arg)
-  love.window.setMode(800, 800);
+  WindowSize.x = 1280;
+  WindowSize.y = 720;
+  love.window.setMode(WindowSize.x, WindowSize.y);
 
   --sti = require("sti");
   --map = sti("Resources/Tilemaps/ExampleTimemap.lua");

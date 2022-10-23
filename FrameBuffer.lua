@@ -2,7 +2,7 @@ local Framebuffer = {Shader};
 local Moonshine = require('moonshine')
 
 function Framebuffer:InitFrameBuffer()
-  Framebuffer.canvas = love.graphics.newCanvas(800, 800);
+  Framebuffer.canvas = love.graphics.newCanvas(WindowSize.x, WindowSize.y);
 
   love.graphics.setCanvas(Framebuffer.canvas);
   love.graphics.clear(0,0,0,0);

@@ -1,7 +1,7 @@
-local Sprite = {XPos, YPos, R = 1, G = 1, B = 1};
+local Sprite = {};
 
 function Sprite:new(_sprite)
-  _sprite = _sprite or {};
+  _sprite = _sprite or {XPos, YPos, R = 1, G = 1, B = 1, XScale = 0.5, YScale = 0.5};
   setmetatable(_sprite, self);
   self.__index = self;
   return _sprite;
@@ -11,6 +11,11 @@ function Sprite:Create(_filePath, _xPos, _yPos)
   self.Image = love.graphics.newImage(_filePath);
   self.XPos = _xPos;
   self.YPos = _yPos;
+end
+
+function Sprite:SetScale(_x, _y)
+  self.XScale = _x;
+  self.YScale = _y;
 end
 
 function Sprite:SetColor(_r, _g, _b)
@@ -33,8 +38,8 @@ function Sprite:Draw()
   self.XPos,
   self.YPos,
   0,
-  0.5,
-  0.5,
+  self.XScale,
+  self.YScale,
   self.Image:getWidth()/2,
   self.Image:getHeight()/2);
   love.graphics.setColor( 1, 1, 1 );

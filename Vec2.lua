@@ -1,7 +1,7 @@
-local Vec2 = {x = 0.0, y = 0.0};
+local Vec2 = {};
 
 function Vec2:new(_vec2)
-  _vec2 = _vec2 or {};
+  _vec2 = _vec2 or {x = 0.0, y = 0.0};
   setmetatable(_vec2, self);
   self.__index = self;
   return _vec2;

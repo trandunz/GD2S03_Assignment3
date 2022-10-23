@@ -1,18 +1,20 @@
-local Player = {Sprite = require("AnimatedSprite"):new(), MoveSpeed = 20, JumpHeight = 3500, MoveInput = require("Vec2"):new(), RigidBody, IsGrounded = false, DashDuration = 0.34, DashTimer = 0, DashSpeed = 50, IsCrouched = false, CrouchDuration = 0.28, CrouchTimer = 0};
+local Player = {Sprite = require("AnimatedSprite"):new(), MoveSpeed = 20, JumpHeight = 3500, MoveInput = require("Vec2"):new(), RigidBody = require("RigidBody"):new(), IsGrounded = false, DashDuration = 0.34, DashTimer = 0, DashSpeed = 50, IsCrouched = false,
+CrouchDuration = 0.28, CrouchTimer = 0, ShootDuration = 0.24, ShootTimer = 0};
 
 function Player.Create(_xPos, _yPos, _world)
-  Player.Sprite:Create("Resources/Textures/Player.png", _xPos, _yPos, 326 ,169);
+  Player.Sprite:Create("Resources/Textures/Player_Shoot.png", _xPos, _yPos, 326 ,169);
   Player.Sprite:AddAnimation('1-9', 0.059);
   Player.Sprite:AddAnimation('10-25', 0.04);
   Player.Sprite:AddAnimation('26-33', 0.03);
   Player.Sprite:AddAnimation('34-41', 0.05);
   Player.Sprite:AddAnimation('42-49', 0.05);
-  Player.Sprite:AddAnimation('50-54', 0.08);
+  Player.Sprite:AddAnimation('50-57', 0.08);
+  Player.Sprite:AddAnimation('58-63', 0.041);
+  Player.Sprite:AddAnimation('64-68', 0.05);
   Player.Sprite.CurrentAnimation = 1;
 
-  Player.RigidBody = require("RigidBody"):new();
   Player.RigidBody:SetWorld(_world);
-  Player.RigidBody:CreateCube(_xPos, _yPos, Player.Sprite.xFrameSize - 230, Player.Sprite.yFrameSize - 20, "dynamic", 0, "player");
+  Player.RigidBody:CreateCube(_xPos, _yPos, Player.Sprite.xFrameSize - 230, Player.Sprite.yFrameSize - 50, "dynamic", 0, "player", 0, 15, self);
   Player.RigidBody:SetFixedToRotation(true);
 end
 
@@ -23,19 +25,34 @@ function Player.GrabInput()
   if love.keyboard.isDown("up") and Player.IsCrouched == false then
     Player.MoveInput.y = Player.MoveInput.y - 1;
   end
-  if love.keyboard.isDown("down") then
+  if love.keyboard.isDown("down") and Player.DashTimer <= 0 then
     Player.IsCrouched = true;
+  elseif love.keyboard.isDown("down") and Player.DashTimer > 0 then
+    Player.RigidBody:ResetSize();
+    Player.IsCrouched = false;
+    Player.CrouchTimer = Player.CrouchDuration;
   else
     Player.RigidBody:ResetSize();
     Player.IsCrouched = false;
   end
-  if love.keyboard.isDown("left") and Player.IsCrouched == false then
+  if love.keyboard.isDown("left") then
     Player.MoveInput.x = Player.MoveInput.x - 1;
+    if Player.RigidBody:GetVelocity().x < 0 or Player.IsCrouched == true then
+      Player.Sprite:SetScale(-1,1);
+    end
   end
-  if love.keyboard.isDown("right") and Player.IsCrouched == false then
+  if love.keyboard.isDown("right") then
     Player.MoveInput.x = Player.MoveInput.x + 1;
+
+    if Player.RigidBody:GetVelocity().x > 0 or Player.IsCrouched == true then
+      Player.Sprite:SetScale(1,1);
+    end
   end
 
+  if love.keyboard.isDown("c") and Player.ShootTimer <= 0  then
+    ProjectileManager.CreateProjectile(Player.RigidBody:GetCenter().x, Player.RigidBody:GetCenter().y, Player.RigidBody:GetWorld(), Player.Sprite.XScale, 0, 2000, true, 1);
+    Player.ShootTimer = Player.ShootDuration;
+  end
   --Player.MoveInput:Normalize();
 end
 
@@ -44,7 +61,6 @@ function Player.KeyEvents( key, scancode, isrepeat )
     Player.ApplyLinearImpulse(0, -Player.JumpHeight);
   end
   if key == "down" then
-    Player.RigidBody:SetSize(Player.Sprite.xFrameSize - 230, Player.Sprite.yFrameSize - 100, 0, 40);
     Player.CrouchTimer = Player.CrouchDuration;
   end
   if key == "space" and Player.DashTimer <= 0 then
@@ -57,7 +73,9 @@ function Player.Update(_dt)
   Player.Sprite.YPos = Player.RigidBody:GetPosition().y;
   Player.Sprite:Update(_dt);
 
-  if Player.DashTimer <= 0 then
+  if Player.IsCrouched == true and Player.IsGrounded == true then
+    Player.SetXVelocity(0);
+  elseif Player.DashTimer <= 0 then
     Player.DashTimer = 0;
     Player.SetXVelocity(Player.MoveInput.x * Player.MoveSpeed);
   else
@@ -65,14 +83,17 @@ function Player.Update(_dt)
     Player.DashTimer = Player.DashTimer - _dt;
   end
 
-  if Player.IsCrouched == true then
+  if Player.ShootTimer > 0 then
+    Player.ShootTimer = Player.ShootTimer - _dt;
   end
 
-  if Player.DashTimer > 0.1 then
+  if Player.DashTimer > 0.001 then
     Player.Sprite.CurrentAnimation = 4;
   elseif Player.IsGrounded == false then
+    Player.RigidBody:SetSize(Player.Sprite.xFrameSize - 230, Player.Sprite.yFrameSize - 100, 0, 40);
     Player.Sprite.CurrentAnimation = 3;
   elseif Player.IsCrouched == true then
+    Player.RigidBody:SetSize(Player.Sprite.xFrameSize - 230, Player.Sprite.yFrameSize - 100, 0, 40);
     if Player.CrouchTimer > 0 then
       Player.Sprite.CurrentAnimation = 5;
       Player.CrouchTimer = Player.CrouchTimer - _dt;
@@ -80,16 +101,15 @@ function Player.Update(_dt)
       Player.CrouchTimer = 0;
       Player.Sprite.CurrentAnimation = 6;
     end
+    if Player.ShootTimer > 0.001 then
+      Player.Sprite.CurrentAnimation = 8;
+    end
+  elseif Player.ShootTimer > 0.001 then
+      Player.Sprite.CurrentAnimation = 7;
   elseif Player.RigidBody:GetXSpeed() > 0.01 then
     Player.Sprite.CurrentAnimation = 2;
   else
     Player.Sprite.CurrentAnimation = 1;
-  end
-
-  if Player.RigidBody:GetVelocity().x < 0 then
-    Player.Sprite:SetScale(-1,1);
-  elseif Player.RigidBody:GetVelocity().x > 0 then
-    Player.Sprite:SetScale(1,1);
   end
 end
 

@@ -1,19 +1,22 @@
-local MainMenu = {Play = require("Sprite"):new(),Options = require("Sprite"):new(),Exit = require("Sprite"):new(), MenuSelection = 0};
+local MainMenu = {};
 
 function MainMenu:new(_mainMenu)
-  _mainMenu = _mainMenu or {};
+  _mainMenu = _mainMenu or {BG = require("Sprite"):new(), Play = require("Sprite"):new(),Options = require("Sprite"):new(),Exit = require("Sprite"):new(), MenuSelection = 0};
   setmetatable(_mainMenu, self);
   self.__index = self;
   return _mainMenu;
 end
 
 function MainMenu:Start()
-    self.Play:Create("Resources/Textures/Start.png", 400, 350);
+    self.Play:Create("Resources/Textures/Start.png", WindowSize.x/2, (WindowSize.y/2) - 50);
     self.Play:SetColor(255,255,255);
-    self.Options:Create("Resources/Textures/Options.png", 400, 400);
+    self.Options:Create("Resources/Textures/Options.png", WindowSize.x/2, WindowSize.y/2);
     self.Options:SetColor(150,150,150);
-    self.Exit:Create("Resources/Textures/Exit.png", 400, 450);
+    self.Exit:Create("Resources/Textures/Exit.png", WindowSize.x/2, (WindowSize.y/2) + 50);
     self.Exit:SetColor(150,150,150);
+
+    self.BG:Create("Resources/Textures/MM.png", WindowSize.x/2, WindowSize.y/2);
+    self.BG:SetScale(0.91,0.91);
 end
 
 function MainMenu:Update(_dt)
@@ -56,6 +59,7 @@ function MainMenu:KeyEvents( key, scancode, isrepeat )
 end
 
 function MainMenu:Draw()
+    self.BG:Draw();
     self.Play:Draw();
     self.Options:Draw();
     self.Exit:Draw();

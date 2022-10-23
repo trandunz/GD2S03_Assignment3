@@ -1,7 +1,7 @@
-local Text = {Font = "", String, xPos, yPos};
+local Text = {};
 
 function Text:new(_text)
-  _text = _text or {};
+  _text = _text or {Font = "", String, xPos, yPos};
   setmetatable(_text, self);
   self.__index = self;
   return _text;

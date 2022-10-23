@@ -1,14 +1,14 @@
-AnimatedSprite = {XPos, YPos, XScale = 1, YScale = 1, R = 1, G = 1, B = 1, Grid, Animations = {}, xFrameSize, yFrameSize, NumerOfAnimations = 0, CurrentAnimation = 0};
-anim8 = require("anim8/anim8");
+local AnimatedSprite = {};
+local anim8 = require("anim8/anim8");
 
 function AnimatedSprite:new(_animatedSprite)
-  _animatedSprite = _animatedSprite or {};
+  _animatedSprite = _animatedSprite or {XPos, YPos, XScale = 1, YScale = 1, R = 1, G = 1, B = 1, Grid, Animations = {}, xFrameSize, yFrameSize, NumerOfAnimations = 0, CurrentAnimation = 0};
   setmetatable(_animatedSprite, self);
   self.__index = self;
   return _animatedSprite;
 end
 
-function AnimatedSprite:Create(_filePath, _xPos, _yPos, _xFrameSize, _yFrameSize, _numOfAnimations)
+function AnimatedSprite:Create(_filePath, _xPos, _yPos, _xFrameSize, _yFrameSize)
   self.Image = love.graphics.newImage(_filePath);
   self.XPos = _xPos;
   self.YPos = _yPos;

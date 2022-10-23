@@ -1,7 +1,7 @@
-local RigidBody = {World, body, fixture, shape, position = require("Vec2"):new(), Density = 1, sizeX = 0, sizeY = 0, offsetX = 0, offsetY = 0};
+local RigidBody = {};
 
 function RigidBody:new(_rigidBody)
-  _rigidBody = _rigidBody or {};
+  _rigidBody = _rigidBody or {World, body, fixture, shape, position = require("Vec2"):new(), Density = 1, sizeX = 0, sizeY = 0, offsetX = 0, offsetY = 0};
   setmetatable(_rigidBody, self);
   self.__index = self;
   return _rigidBody;
@@ -18,70 +18,128 @@ function RigidBody:Create(_xPos, _yPos, _shape, _bodyType, _userData)
  self.Density = self.fixture.density;
 end
 
-function RigidBody:CreateCube(_xPos, _yPos, _xSize, _ySize, _bodyType, _angle, _userData)
+function RigidBody:GetWorld()
+  if self.body ~= nil then
+    return self.body:getWorld();
+  end
+end
+
+function RigidBody:CreateCube(_xPos, _yPos, _xSize, _ySize, _bodyType, _angle, _userDataFixture, _xOffset, _yOffset, _sensor, _userDataBody)
+  _xOffset = _xOffset or 0;
+  _yOffset = _yOffset or 0;
+  _sensor = _sensor or false;
+
   self.body = love.physics.newBody(self.World, _xPos , _yPos , _bodyType);
-  self.shape = love.physics.newRectangleShape(0,0,_xSize, _ySize,_angle);
+  self.shape = love.physics.newRectangleShape(_xOffset,_yOffset,_xSize, _ySize,_angle);
   self.fixture = love.physics.newFixture(self.body, self.shape, 1);
-  self.fixture:setUserData(_userData);
+  self.fixture:setUserData(_userDataFixture);
+  self.body:setUserData(_userDataBody);
   self.Density = self.fixture.density;
+  self.fixture:setSensor(_sensor);
   self.sizeX = _xSize;
   self.sizeY = _ySize;
+  self.offsetX = _xOffset;
+  self.offsetY = _yOffset;
 end
 
 function RigidBody:SetSize(_x, _y, _xOffset, _yOffset)
-  self.shape = love.physics.newRectangleShape(_xOffset,_yOffset,_x, _y,0);
+  if self.body ~= nil then
+    self.shape = love.physics.newRectangleShape(_xOffset,_yOffset,_x, _y,0);
+  end
 end
 
 function RigidBody:ResetSize()
-   self.shape = love.physics.newRectangleShape(self.offsetX,self.offsetY,self.sizeX, self.sizeY,0);
+  if self.body ~= nil then
+    self.shape = love.physics.newRectangleShape(self.offsetX,self.offsetY,self.sizeX, self.sizeY,0);
+  end
+end
+
+function RigidBody:Destroy()
+  if self.body ~= nil then
+    self.body:destroy();
+  end
+end
+
+function RigidBody:SetGravity(_scale)
+  if self.body ~= nil then
+    self.body:setGravityScale(_scale);
+  end
 end
 
 function RigidBody:SetDensity(_density)
-  self.fixture:setDensity(_density);
+  if self.body ~= nil then
+    self.fixture:setDensity(_density);
+  end
+end
+
+function RigidBody:GetCenter()
+  if self.body ~= nil then
+    local center = require("Vec2"):new();
+    center.x, center.y = self.body:getWorldCenter();
+    return center;
+  end
 end
 
 function RigidBody:ResetDensity()
-  self.fixture:setDensity(self.Density);
+  if self.body ~= nil then
+    self.fixture:setDensity(self.Density);
+  end
 end
 
 function RigidBody:SetFixedToRotation(_fixedRotation)
-  self.body:setFixedRotation(_fixedRotation);
+  if self.body ~= nil then
+    self.body:setFixedRotation(_fixedRotation);
+  end
 end
 
 function RigidBody:ApplyLinearImpulse(_x, _y)
-  self.body:applyLinearImpulse(_x, _y);
+  if self.body ~= nil then
+    self.body:applyLinearImpulse(_x, _y);
+  end
 end
 
 function RigidBody:GetVelocity()
-  local velocity = require("Vec2"):new();
-  velocity.x, velocity.y = self.body:getLinearVelocity();
-  return velocity;
+  if self.body ~= nil then
+    local velocity = require("Vec2"):new();
+    velocity.x, velocity.y = self.body:getLinearVelocity();
+    return velocity;
+  end
 end
 
 function RigidBody:GetXSpeed()
-  local velocity = require("Vec2"):new();
-  velocity.x, velocity.y = self.body:getLinearVelocity();
-  return math.sqrt(velocity.x * velocity.x);
+  if self.body ~= nil then
+    local velocity = require("Vec2"):new();
+    velocity.x, velocity.y = self.body:getLinearVelocity();
+    return math.sqrt(velocity.x * velocity.x);
+  end
 end
 
 function RigidBody:GetYSpeed()
-  local velocity = require("Vec2"):new();
-  velocity.x, velocity.y = self.body:getLinearVelocity();
-  return math.sqrt(velocity.y * velocity.y);
+  if self.body ~= nil then
+    local velocity = require("Vec2"):new();
+    velocity.x, velocity.y = self.body:getLinearVelocity();
+    return math.sqrt(velocity.y * velocity.y);
+  end
 end
 
 function RigidBody:GetPosition()
-  self.position.x = self.body:getX();
-  self.position.y = self.body:getY();
-  return self.position;
+  if self.body ~= nil then
+    self.position.x = self.body:getX();
+    self.position.y = self.body:getY();
+    return self.position;
+  end
 end
 
 function RigidBody:Draw()
-  love.graphics.polygon("line", self.body:getWorldPoints(self.shape:getPoints()))
+  if self.body ~= nil and DebugDraw == true then
+    love.graphics.polygon("line", self.body:getWorldPoints(self.shape:getPoints()))
+  end
 end
 
 function RigidBody:SetVelocity(_xVelocity, _yVelocity)
-  self.body:setLinearVelocity(_xVelocity,_yVelocity);
+  if self.body ~= nil then
+    self.body:setLinearVelocity(_xVelocity,_yVelocity);
+  end
 end
 
 return RigidBody;

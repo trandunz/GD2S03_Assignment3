@@ -8,7 +8,7 @@ Player = require("Player");
 
 function Scene:new(_scene)
   _scene = _scene or {World = require("World"):new(), Sky = require("Sprite"):new(),
-Map = STI("Resources/Tilemaps/LevelOne.lua"), Platforms = {}, AudioManager = require("AudioManager"):new(), GameOver = false};
+Map = STI("Resources/Tilemaps/Tutorial.lua"), Platforms = {}, Floor = {}, Destructables = {}, AudioManager = require("AudioManager"):new(), GameOver = false};
   setmetatable(_scene, self);
   self.__index = self;
   return _scene;
@@ -37,23 +37,40 @@ function Scene:Start()
   GUI.Elements.Health:SetScale(1,1);
 
   self.camera = HUMP();
+  self.camera:lookAt(WindowSize.x / 2, WindowSize.y / 2 + 300);
 
   self.World:InitWorld();
   EnemyManager.Init(self.World.world);
 
-  self.Sky:Create("Resources/Textures/Botanic/Sky.png", WindowSize.x/2, WindowSize.y/2 - 90);
-  self.Sky:SetScale(1.5, 1.5);
+  self.Sky:Create("Resources/Textures/Tutorial/BG.png", WindowSize.x/2, WindowSize.y/2);
+  self.Sky:SetScale(1.35, 1.35);
 
-  Player.Create(WindowSize.x / 2, WindowSize.y/2, self.World.world);
-  EnemyManager.CreateLober(WindowSize.x / 2 + 300, WindowSize.y - 245);
-  EnemyManager.CreateLober(WindowSize.x / 2 + 930, WindowSize.y - 450);
-  EnemyManager.CreateLober(200, WindowSize.y - 245);
+  Player.Create(WindowSize.x/2 - 400, WindowSize.y/2 + 400, self.World.world);
+  EnemyManager.CreateBullseye(WindowSize.x / 2 + 2450, WindowSize.y - 200);
 
+  for i, obj in pairs(self.Map.layers["Floor"].objects) do
+    local rigidBody = require("RigidBody"):new();
+    rigidBody:SetWorld(self.World.world);
+    rigidBody:CreateCube(obj.x, obj.y, obj.width, obj.height, "static", 0, "floor", obj.width / 2, obj.height / 2);
+    table.insert(self.Floor, rigidBody);
+  end
+  for i, obj in pairs(self.Map.layers["Walls"].objects) do
+    local rigidBody = require("RigidBody"):new();
+    rigidBody:SetWorld(self.World.world);
+    rigidBody:CreateCube(obj.x, obj.y, obj.width, obj.height, "static", 0, "walls", obj.width / 2, obj.height / 2);
+    table.insert(self.Floor, rigidBody);
+  end
   for i, obj in pairs(self.Map.layers["Platforms"].objects) do
     local rigidBody = require("RigidBody"):new();
     rigidBody:SetWorld(self.World.world);
     rigidBody:CreateCube(obj.x, obj.y, obj.width, obj.height, "static", 0, "floor", obj.width / 2, obj.height / 2);
     table.insert(self.Platforms, rigidBody);
+  end
+  for i, obj in pairs(self.Map.layers["Destructable"].objects) do
+    local rigidBody = require("RigidBody"):new();
+    rigidBody:SetWorld(self.World.world);
+    rigidBody:CreateCube(obj.x, obj.y, obj.width, obj.height, "static", 0, "destructable", obj.width / 2, obj.height / 2);
+    table.insert(self.Destructables, rigidBody);
   end
 end
 
@@ -64,13 +81,25 @@ function Scene:Update(_dt)
 
   self.AudioManager:Update();
 
+  if love.keyboard.isDown("down") then
+    for i, v in pairs(self.Platforms) do
+      v:ToggleCollision(false);
+    end
+  else
+    for i, v in pairs(self.Platforms) do
+      v:ToggleCollision(true);
+    end
+  end
+
   self.Map:update(_dt);
 
   self.World:Update(_dt);
   if self.GameOver == false then
     Player.GrabInput();
     Player.Update(_dt);
-    self.camera:lookAt(Player.GetPosition().x, 280);
+    if Player.GetPosition().x >= WindowSize.x /2 and Player.GetPosition().x <= 4450 then
+      self.camera:lookAt(Player.GetPosition().x, WindowSize.y / 2 + 300);
+    end
   end
   self:UpdatePlayerHPGUI();
 
@@ -121,8 +150,19 @@ function Scene:Draw()
 
   self.camera:attach();
 
-  self.Map:drawLayer(self.Map.layers["Tile Layer 1"]);
-  for i, v in pairs(self.Platforms) do
+  love.graphics.setScissor(  32, 30, WindowSize.x - 74, WindowSize.y );
+
+  self.Map:drawLayer(self.Map.layers["Tile Layer 3"]);
+  self.Map:drawLayer(self.Map.layers["Tile Layer 2"]);
+  if EnemyManager.EnemyCount > 0 then
+    self.Map:drawLayer(self.Map.layers["Tile Layer 4"]);
+  else
+    if self.Destructables[1] then
+      self.Destructables[1]:Destroy();
+    end
+    self.Destructables[1] = nil;
+  end
+  for i, v in pairs(self.Floor) do
     v:Draw();
   end
   EnemyManager.Draw();
@@ -132,6 +172,8 @@ function Scene:Draw()
   end
 
   ProjectileManager.Draw();
+
+  love.graphics.setScissor( 0, 0, WindowSize.x, WindowSize.y )
 
   self.camera:detach();
 

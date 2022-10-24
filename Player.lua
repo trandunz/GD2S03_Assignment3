@@ -1,4 +1,4 @@
-local Player = {Sprite, MoveSpeed = 20, JumpHeight = 3500, MoveInput, Input, RigidBody, IsGrounded = false, DashDuration = 0.34, DashTimer = 0, DashSpeed = 50, IsCrouched = false,
+local Player = {Sprite, MoveSpeed = 20, JumpHeight = 4000, MoveInput, Input, RigidBody, IsGrounded = false, DashDuration = 0.34, DashTimer = 0, DashSpeed = 50, IsCrouched = false,
 CrouchDuration = 0.28, CrouchTimer = 0, ShootDuration = 0.24, ShootTimer = 0, Health = 3, IntroTimer = 1.62, DamageTimer = 0, DamageInterval = 0.24, ElapsedTime = 0,
 AudioManager, Destroy = false, DeathTimer = 0.64, AimLock = false};
 
@@ -10,7 +10,7 @@ function Player.Create(_xPos, _yPos, _world)
   Player.AudioManager = require("AudioManager"):new();
   Player.Health = 3;
   Player.MoveSpeed = 20;
-  Player.JumpHeight = 3500;
+  Player.JumpHeight = 4000;
   Player.IsGrounded = false;
   Player.DashTimer = 0;
   Player.IsCrouched = false;
@@ -154,7 +154,7 @@ function Player.Jump()
 end
 
 function Player.Shoot()
-  if Player.IntroTimer <= 0 and Player.Destroy == false and Player.DamageTimer <= 0 then
+  if Player.IntroTimer <= 0 and Player.Health > 0 and Player.DamageTimer <= 0 then
     if Player.AimLock == false then
       ProjectileManager.CreateProjectile(Player.RigidBody:GetCenter().x, Player.RigidBody:GetCenter().y, Player.RigidBody:GetWorld(), Player.Sprite.XScale, 0, 2000, true, 1);
     else
@@ -271,6 +271,8 @@ function Player.HandleAimLockAnims()
       Player.Sprite.CurrentAnimation = 15;
     elseif Player.Input.x ~= 0 and Player.Input.y > 0 then
       Player.Sprite.CurrentAnimation = 16;
+    elseif Player.Input.x == 0 and Player.Input.y == 0 then
+      Player.Sprite.CurrentAnimation = 12;
     end
   else
     if Player.Input.x ~= 0 and Player.Input.y == 0 then
@@ -283,6 +285,8 @@ function Player.HandleAimLockAnims()
       Player.Sprite.CurrentAnimation = 20;
     elseif Player.Input.x ~= 0 and Player.Input.y > 0 then
       Player.Sprite.CurrentAnimation = 21;
+    elseif Player.Input.x == 0 and Player.Input.y == 0 then
+      Player.Sprite.CurrentAnimation = 17;
     end
   end
 end

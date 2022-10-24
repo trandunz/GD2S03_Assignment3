@@ -7,6 +7,18 @@ function BeginContact(_fixtureA, _fixtureB, _collision)
     Player.IsGrounded = true;
   end
 
+  if _fixtureA:getUserData() == "projectile" and _fixtureB:getUserData() == "projectile" then
+      local projectile = _fixtureA:getBody():getUserData();
+      local projectile2 = _fixtureB:getBody():getUserData()
+      projectile.Destroy = true;
+      projectile2.Destroy = true;
+  elseif _fixtureB:getUserData() == "projectile" and _fixtureA:getUserData() == "projectile" then
+      local projectile = _fixtureB:getBody():getUserData()
+      local projectile2 = _fixtureA:getBody():getUserData()
+      projectile.Destroy = true;
+      projectile2.Destroy = true;
+  end
+
   if _fixtureA:getUserData() == "projectile" and _fixtureB:getUserData() == "floor" then
       local projectile = _fixtureA:getBody():getUserData();
       projectile.Destroy = true;

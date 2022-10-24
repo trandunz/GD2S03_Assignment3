@@ -29,7 +29,7 @@ function Projectile:Create(_xPos, _yPos, _world, _DirectionX, _DirectionY, _spee
   self.Sprite.CurrentAnimation = 1;
 
   self.RigidBody:SetWorld(_world);
-  self.RigidBody:CreateCube(_xPos, _yPos, self.Sprite.xFrameSize, self.Sprite.yFrameSize - 30, "dynamic", 0, "projectile", 0, 0, true, self);
+  self.RigidBody:CreateCube(_xPos, _yPos, self.Sprite.xFrameSize - 30, self.Sprite.yFrameSize - 30, "dynamic", 0, "projectile", 0, 0, true, self);
   self.RigidBody:SetFixedToRotation(true);
   self.RigidBody:SetGravity(0);
 end
@@ -69,20 +69,28 @@ function Projectile:Update(_dt)
     if self.Type == "PeaShooter" then
       if self.Direction.x > 0 and self.Direction.y == 0 then
         self.Sprite:SetRotation(math.rad(0));
+        self.RigidBody:SetRotation(math.rad(0));
       elseif self.Direction.x < 0 and self.Direction.y == 0 then
         self.Sprite:SetRotation(math.rad(180));
+        self.RigidBody:SetRotation(math.rad(180));
       elseif self.Direction.y < 0 and self.Direction.x == 0 then
         self.Sprite:SetRotation(math.rad(-90));
+        self.RigidBody:SetRotation(math.rad(-90));
       elseif self.Direction.y > 0 and self.Direction.x == 0 then
         self.Sprite:SetRotation(math.rad(90));
+        self.RigidBody:SetRotation(math.rad(90));
       elseif self.Direction.x > 0 and self.Direction.y < 0 then
         self.Sprite:SetRotation(math.rad(-45));
+        self.RigidBody:SetRotation(math.rad(-45));
       elseif self.Direction.x > 0 and self.Direction.y > 0 then
         self.Sprite:SetRotation(math.rad(45));
+        self.RigidBody:SetRotation(math.rad(45));
       elseif self.Direction.x < 0 and self.Direction.y < 0 then
         self.Sprite:SetRotation(math.rad(-135));
+        self.RigidBody:SetRotation(math.rad(-135));
       elseif self.Direction.x < 0 and self.Direction.y > 0 then
         self.Sprite:SetRotation(math.rad(135));
+        self.RigidBody:SetRotation(math.rad(135));
       end
     end
 

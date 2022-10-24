@@ -61,6 +61,12 @@ function RigidBody:Destroy()
   end
 end
 
+function RigidBody:SetRotation(_radians)
+  if self.body ~= nil then
+    self.body:setAngle(_radians);
+  end
+end
+
 function RigidBody:SetGravity(_scale)
   if self.body ~= nil then
     self.body:setGravityScale(_scale);
@@ -120,6 +126,12 @@ function RigidBody:GetYSpeed()
     local velocity = require("Vec2"):new();
     velocity.x, velocity.y = self.body:getLinearVelocity();
     return math.sqrt(velocity.y * velocity.y);
+  end
+end
+
+function RigidBody:ToggleCollision(_collisionEnabled)
+  if self.fixture ~= nil then
+    self.fixture:setSensor(not _collisionEnabled);
   end
 end
 

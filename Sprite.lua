@@ -1,7 +1,7 @@
 local Sprite = {};
 
 function Sprite:new(_sprite)
-  _sprite = _sprite or {XPos, YPos, R = 1, G = 1, B = 1, XScale = 0.5, YScale = 0.5};
+  _sprite = _sprite or {XPos, YPos, R = 1, G = 1, B = 1, XScale = 0.5, YScale = 0.5, Rotation = 0};
   setmetatable(_sprite, self);
   self.__index = self;
   return _sprite;
@@ -18,6 +18,10 @@ function Sprite:GetPosition()
   pos.x = self.XPos;
   pos.y = self.YPos;
   return pos;
+end
+
+function Sprite:Rotate(_amount)
+  self.Rotation = self.Rotation + _amount;
 end
 
 function Sprite:SetScale(_x, _y)
@@ -48,7 +52,7 @@ function Sprite:Draw()
   love.graphics.draw(self.Image,
   self.XPos,
   self.YPos,
-  0,
+  self.Rotation,
   self.XScale,
   self.YScale,
   self.Image:getWidth()/2,

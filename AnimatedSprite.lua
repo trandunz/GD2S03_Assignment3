@@ -2,7 +2,8 @@ local AnimatedSprite = {};
 local anim8 = require("anim8/anim8");
 
 function AnimatedSprite:new(_animatedSprite)
-  _animatedSprite = _animatedSprite or {XPos, YPos, XScale = 1, YScale = 1, R = 1, G = 1, B = 1, Grid, Animations = {}, xFrameSize, yFrameSize, NumerOfAnimations = 0, CurrentAnimation = 0};
+  _animatedSprite = _animatedSprite or {XPos, YPos, XScale = 1, YScale = 1, R = 1, G = 1, B = 1, A = 1, Grid, Animations = {}, xFrameSize, yFrameSize, NumerOfAnimations = 0,
+   CurrentAnimation = 0, Rotation = 0};
   setmetatable(_animatedSprite, self);
   self.__index = self;
   return _animatedSprite;
@@ -14,18 +15,23 @@ function AnimatedSprite:Create(_filePath, _xPos, _yPos, _xFrameSize, _yFrameSize
   self.YPos = _yPos;
   self.xFrameSize = _xFrameSize;
   self.yFrameSize = _yFrameSize;
-  self.Grid = anim8.newGrid(self.xFrameSize, self.yFrameSize, self.Image:getWidth(), self.Image:getHeight())
 end
 
-function AnimatedSprite:AddAnimation(_frameRange, _frameDuration)
+function AnimatedSprite:AddAnimation(_frameRange, _frameDuration, _gridX, _gridY)
+  _gridX = _gridX or 0;
+  _gridY = _gridY or 0;
   self.NumerOfAnimations = self.NumerOfAnimations + 1;
-  self.Animations[self.NumerOfAnimations] = anim8.newAnimation(self.Grid(_frameRange,1), _frameDuration)
+  self.Grid = anim8.newGrid(self.xFrameSize, self.yFrameSize, self.Image:getWidth(), self.Image:getHeight(), _gridX, _gridY);
+  self.Animations[self.NumerOfAnimations] = anim8.newAnimation(self.Grid(_frameRange,1), _frameDuration);
 end
 
-function AnimatedSprite:SetColor(_r, _g, _b)
+function AnimatedSprite:SetColor(_r, _g, _b, _a)
+  _a = _a or 255;
+
   self.R = _r / 255;
   self.G = _g / 255;
   self.B = _b / 255
+  self.A = _a / 255;
 end
 
 function AnimatedSprite:GetWidth()
@@ -39,6 +45,10 @@ end
 
 function AnimatedSprite:GetHeight()
   return self.Image:getHeight();
+end
+
+function AnimatedSprite:SetRotation(_rotation)
+  self.Rotation = _rotation;
 end
 
 function AnimatedSprite:GetPosition()
@@ -59,9 +69,9 @@ function AnimatedSprite:Update(_dt)
 end
 
 function AnimatedSprite:Draw()
-  love.graphics.setColor( self.R, self.G, self.B );
-  self.Animations[self.CurrentAnimation]:draw(self.Image, self.XPos, self.YPos, 0, self.XScale,self.YScale,self.xFrameSize/2, self.yFrameSize/2);
-  love.graphics.setColor( 1, 1, 1 );
+  love.graphics.setColor( self.R, self.G, self.B, self.A);
+  self.Animations[self.CurrentAnimation]:draw(self.Image, self.XPos, self.YPos, self.Rotation, self.XScale,self.YScale,self.xFrameSize/2, self.yFrameSize/2);
+  love.graphics.setColor( 1, 1, 1 , 1);
 end
 
 return AnimatedSprite;

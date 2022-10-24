@@ -1,4 +1,4 @@
-local LevelLoader = {pendingChange = false, levelToLoad = "", currentLevel, transitionRatio = 1.0};
+local LevelLoader = {pendingChange = false, levelToLoad = "", currentLevel, previousLevel, transitionRatio = 1.0};
 local FrameBuffer = require("FrameBuffer");
 local Math = require("Math");
 
@@ -9,7 +9,14 @@ end
 
 function LevelLoader:LoadLevel(_level)
   LevelLoader.pendingChange = true;
+  LevelLoader.previousLevel = LevelLoader.levelToLoad;
   LevelLoader.levelToLoad = _level;
+  LevelLoader.transitionRatio = 0.0;
+end
+
+function LevelLoader:LoadPreviousLevel()
+  LevelLoader.pendingChange = true;
+  LevelLoader.levelToLoad = LevelLoader.previousLevel;
   LevelLoader.transitionRatio = 0.0;
 end
 
@@ -33,12 +40,12 @@ end
 
 function LevelLoader:HandleSceneTransition(_dt)
   FrameBuffer.Shader.vignette.radius = Math:Lerp(1.0, 0.0, LevelLoader.transitionRatio);
-  LevelLoader.transitionRatio = LevelLoader.transitionRatio + _dt;
+  LevelLoader.transitionRatio = LevelLoader.transitionRatio + _dt * 2;
 end
 
 function LevelLoader:HandleSceneStartTransition(_dt)
   FrameBuffer.Shader.vignette.radius = Math:Lerp(0.0, 1.0, LevelLoader.transitionRatio);
-  LevelLoader.transitionRatio = LevelLoader.transitionRatio + _dt;
+  LevelLoader.transitionRatio = LevelLoader.transitionRatio + _dt * 2;
 end
 
 function LevelLoader:LoadIfPending(_dt)
@@ -47,7 +54,6 @@ function LevelLoader:LoadIfPending(_dt)
       LevelLoader.transitionRatio = 0.0;
       LevelLoader.currentLevel:Cleanup();
       LevelLoader.currentLevel = nil;
-      AudioManager.ForceCleanup();
       collectgarbage("collect");
       LevelLoader.currentLevel = require(LevelLoader.levelToLoad):new();
       LevelLoader.currentLevel:Start();

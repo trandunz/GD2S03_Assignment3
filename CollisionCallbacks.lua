@@ -11,7 +11,7 @@ function BeginContact(_fixtureA, _fixtureB, _collision)
       local projectile = _fixtureA:getBody():getUserData();
       projectile.Destroy = true;
   elseif _fixtureB:getUserData() == "projectile" and _fixtureA:getUserData() == "floor" then
-      local projectile = _fixtureB:getBody():getUserData();
+      local projectile = _fixtureB:getBody():getUserData()
       projectile.Destroy = true;
   end
 

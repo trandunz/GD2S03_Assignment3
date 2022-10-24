@@ -10,6 +10,16 @@ function EnemyManager.CreateLober(_xPos, _yPos)
   EnemyManager.Enemies[EnemyManager.EnemyCount]:Create(_xPos, _yPos, EnemyManager.World);
 end
 
+function EnemyManager.CreateOnion(_xPos, _yPos)
+  EnemyManager.EnemyCount = EnemyManager.EnemyCount + 1;
+  EnemyManager.Enemies[EnemyManager.EnemyCount] = require("Onion"):new();
+  EnemyManager.Enemies[EnemyManager.EnemyCount]:Create(_xPos, _yPos, EnemyManager.World);
+end
+
+function EnemyManager.GetEnemyCount()
+  return EnemyManager.EnemyCount;
+end
+
 function EnemyManager.Update(_dt)
   for i, v in pairs(EnemyManager.Enemies) do
     EnemyManager.Enemies[i]:Update(_dt);
@@ -30,6 +40,7 @@ function EnemyManager.CleanupDestroyedEnemies()
       EnemyManager.Enemies[i]:Cleanup();
       EnemyManager.Enemies[i].Destroy = false;
       EnemyManager.Enemies[i] = nil;
+      EnemyManager.EnemyCount = EnemyManager.EnemyCount - 1;
     end
   end
   collectgarbage("collect");

@@ -12,6 +12,11 @@ function GUI:CreateImage(_key, _file, _xPos, _yPos)
   self.Elements[_key]:Create(_file, _xPos, _yPos)
 end
 
+function GUI:CreateText(_key, _string, _xPos, _yPos, _align, _angle, _charSize, _r, _g, _b)
+  self.Elements[_key] = require("Text"):new();
+  self.Elements[_key]:Create(_string, _xPos, _yPos, _align, _angle, _charSize, _r, _g, _b);
+end
+
 function GUI:Draw()
   for i, v in pairs(self.Elements) do
     self.Elements[i]:Draw();

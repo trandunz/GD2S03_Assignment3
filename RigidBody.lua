@@ -36,6 +36,7 @@ function RigidBody:CreateCube(_xPos, _yPos, _xSize, _ySize, _bodyType, _angle, _
   self.body:setUserData(_userDataBody);
   self.Density = self.fixture.density;
   self.fixture:setSensor(_sensor);
+  self.fixture:setFriction( 0 );
   self.sizeX = _xSize;
   self.sizeY = _ySize;
   self.offsetX = _xOffset;

@@ -1,9 +1,9 @@
 local ProjectileManager = {Projectiles = {}, ProjectileCount = 0, AudioManager = require("AudioManager"):new()};
 
-function ProjectileManager.CreateProjectile(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _isFriendly, _damage, _type)
+function ProjectileManager.CreateProjectile(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _isFriendly, _damage, _type, _canParry)
   ProjectileManager.ProjectileCount = ProjectileManager.ProjectileCount + 1;
   ProjectileManager.Projectiles[ProjectileManager.ProjectileCount] = require("Projectile"):new();
-  ProjectileManager.Projectiles[ProjectileManager.ProjectileCount]:Create(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _isFriendly, _damage, _type);
+  ProjectileManager.Projectiles[ProjectileManager.ProjectileCount]:Create(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _isFriendly, _damage, _type, _canParry);
 end
 
 function ProjectileManager.Update(_dt)

@@ -8,7 +8,7 @@ Player = require("Player");
 
 function Scene:new(_scene)
   _scene = _scene or {World = require("World"):new(), Sky = require("Sprite"):new(),
-Map = STI("Resources/Tilemaps/Tutorial.lua"), Platforms = {}, Floor = {}, Destructables = {}, AudioManager = require("AudioManager"):new(), GameOver = false};
+Map = STI("Resources/Tilemaps/Tutorial.lua"), Platforms = {}, Floor = {}, Destructables = {}, Interactables = {},AudioManager = require("AudioManager"):new(), GameOver = false};
   setmetatable(_scene, self);
   self.__index = self;
   return _scene;
@@ -48,6 +48,10 @@ function Scene:Start()
   Player.Create(WindowSize.x/2 - 400, WindowSize.y/2 + 400, self.World.world);
   EnemyManager.CreateBullseye(WindowSize.x / 2 + 2450, WindowSize.y - 200);
 
+  ProjectileManager.CreateProjectile(WindowSize.x / 2 + 2750, WindowSize.y - 150, Player.RigidBody:GetWorld(), 0, 0, 0, false, 0, "TutorialBall", true);
+  ProjectileManager.CreateProjectile(WindowSize.x / 2 + 3000, WindowSize.y - 150, Player.RigidBody:GetWorld(), 0, 0, 0, false, 0, "TutorialBall", true);
+  ProjectileManager.CreateProjectile(WindowSize.x / 2 + 3250, WindowSize.y - 150, Player.RigidBody:GetWorld(), 0, 0, 0, false, 0, "TutorialBall", true);
+
   for i, obj in pairs(self.Map.layers["Floor"].objects) do
     local rigidBody = require("RigidBody"):new();
     rigidBody:SetWorld(self.World.world);
@@ -71,6 +75,12 @@ function Scene:Start()
     rigidBody:SetWorld(self.World.world);
     rigidBody:CreateCube(obj.x, obj.y, obj.width, obj.height, "static", 0, "destructable", obj.width / 2, obj.height / 2);
     table.insert(self.Destructables, rigidBody);
+  end
+  for i, obj in pairs(self.Map.layers["Interactables"].objects) do
+    local rigidBody = require("RigidBody"):new();
+    rigidBody:SetWorld(self.World.world);
+    rigidBody:CreateCube(obj.x, obj.y, obj.width, obj.height, "static", 0, "tutorialDoor", obj.width / 2, obj.height / 2, true);
+    table.insert(self.Interactables, rigidBody);
   end
 end
 

@@ -1,6 +1,6 @@
 local Player = {Sprite, MoveSpeed = 20, JumpHeight = 4000, MoveInput, Input, RigidBody, IsGrounded = false, DashDuration = 0.34, DashTimer = 0, DashSpeed = 50, IsCrouched = false,
 CrouchDuration = 0.28, CrouchTimer = 0, ShootDuration = 0.24, ShootTimer = 0, Health = 3, IntroTimer = 1.62, DamageTimer = 0, DamageInterval = 0.24, ElapsedTime = 0,
-AudioManager, Destroy = false, DeathTimer = 0.64, AimLock = false};
+AudioManager, Destroy = false, DeathTimer = 0.64, AimLock = false, ParryTimer = 0, ParryLeway = 0.1, ParryableProjectile, ParticleSystem = require("ParticleSystem"):new()};
 
 function Player.Create(_xPos, _yPos, _world)
   Player.Sprite = require("AnimatedSprite"):new();
@@ -22,6 +22,10 @@ function Player.Create(_xPos, _yPos, _world)
   Player.Destroy = false;
   Player.DeathTimer = 0.64;
   Player.AimLock = false
+  Player.ParryTimer = 0;
+  Player.CachedDamage = 0;
+
+  Player.ParticleSystem:Create("Resources/Textures/Peashooter/ExplosionDust.png",10000, _xPos, _yPos);
 
   Player.Sprite:Create("Resources/Textures/Cuphead/Player_Everything.png", _xPos, _yPos, 326 ,188);
   Player.Sprite:AddAnimation('1-9', 0.059, 0, 0);
@@ -101,31 +105,41 @@ function Player.GrabInput()
     end
   end
 
-  if love.keyboard.isDown("c") and Player.ShootTimer <= 0  then
+  if love.keyboard.isDown("x") and Player.ShootTimer <= 0  then
     Player.Shoot();
   end
 
-  if love.keyboard.isDown("v") and Player.DashTimer <= 0 then
+  if love.keyboard.isDown("c") and Player.DashTimer <= 0 then
     Player.AimLock = true;
   else
     Player.AimLock = false;
   end
 end
 
+function Player.ResetMovementTimers()
+  Player.ShootTimer = 0;
+  Player.CrouchTimer = 0;
+  Player.DashTimer = 0;
+end
+
 function Player.KeyEvents( key, scancode, isrepeat )
-  if key == "up" and Player.IsGrounded == true then
-    Player.Jump();
+  if key == "z" then
+    if Player.IsGrounded == true then
+      Player.Jump();
+    else
+      Player.AttemptParry();
+    end
   end
   if key == "down" then
     Player.CrouchTimer = Player.CrouchDuration;
   end
-  if key == "space" then
+  if key == "lshift" then
     Player.Dash();
   end
 end
 
 function Player.TakeDamage(_amount)
-  if Player.Health > 0  and Player.DamageTimer <= 0 then
+  if Player.Health > 0  and Player.DamageTimer <= 0 and _amount > 0 then
     math.randomseed(os.time());
     local randomSound = math.random(1,5);
     Player.AudioManager:CreateSound("Hit", "Resources/Sounds/Player/Hit (".. randomSound .. ").wav", true, false);
@@ -135,11 +149,18 @@ function Player.TakeDamage(_amount)
     if Player.Health <= 0 then
       Player.Health = 0;
     else
-      Player.ShootTimer = 0;
-      Player.CrouchTimer = 0;
-      Player.DashTimer = 0;
+      Player.ResetMovementTimers();
       Player.ApplyLinearImpulse(0, -1500);
     end
+  end
+end
+
+function Player.AttemptParry()
+  if Player.ParryTimer > 0 then
+    Player.SetYVelocity(-45);
+    Player.ParryableProjectile.ParryAnimTimer = 0.2;
+    Player.ParryableProjectile = nil;
+    Player.ParryTimer = 0;
   end
 end
 
@@ -156,7 +177,11 @@ end
 function Player.Shoot()
   if Player.IntroTimer <= 0 and Player.Health > 0 and Player.DamageTimer <= 0 then
     if Player.AimLock == false then
-      ProjectileManager.CreateProjectile(Player.RigidBody:GetCenter().x, Player.RigidBody:GetCenter().y, Player.RigidBody:GetWorld(), Player.Sprite.XScale, 0, 2000, true, 1);
+      if Player.Input.y < 0 and Player.Input.x == 0 then
+        ProjectileManager.CreateProjectile(Player.RigidBody:GetCenter().x, Player.RigidBody:GetCenter().y, Player.RigidBody:GetWorld(), Player.Input.x, Player.Input.y, 2000, true, 1);
+      else
+        ProjectileManager.CreateProjectile(Player.RigidBody:GetCenter().x, Player.RigidBody:GetCenter().y, Player.RigidBody:GetWorld(), Player.Sprite.XScale, 0, 2000, true, 1);
+      end
     else
       if Player.Input:Mag() == 0 then
         ProjectileManager.CreateProjectile(Player.RigidBody:GetCenter().x, Player.RigidBody:GetCenter().y, Player.RigidBody:GetWorld(), Player.Sprite.XScale, 0, 2000, true, 1);
@@ -183,10 +208,46 @@ end
 
 function Player.Update(_dt)
   Player.ElapsedTime = Player.ElapsedTime + _dt;
+  if Player.ShootTimer > 0 then
+    Player.ShootTimer = Player.ShootTimer - _dt;
+  end
+  if Player.ParryTimer > 0 then
+    Player.ParryTimer = Player.ParryTimer - _dt;
+  elseif Player.ParryableProjectile ~= nil then
+    Player.TakeDamage(Player.ParryableProjectile.Damage);
+    Player.ParryableProjectile = nil;
+  end
+
+  Player.ParticleSystem:Update(_dt);
+
+  Player.SetSpritePositionToRigidBody(_dt);
+  Player.HandleDamage(_dt);
+  Player.Movement(_dt);
+  Player.HandleAnimationState(_dt);
+  Player.CheckForDeath(_dt);
+
+end
+
+function Player.CheckForDeath(_dt)
+  if Player.Health <= 0 then
+    if Player.DeathTimer > 0 then
+      Player.DeathTimer = Player.DeathTimer - _dt;
+      Player.Sprite.CurrentAnimation = 11;
+      Player.SetYVelocity(0);
+      Player.SetXVelocity(0);
+    else
+      Player.Destroy = true;
+    end
+  end
+end
+
+function Player.SetSpritePositionToRigidBody(_dt)
   Player.Sprite.XPos = Player.RigidBody:GetPosition().x;
   Player.Sprite.YPos = Player.RigidBody:GetPosition().y;
   Player.Sprite:Update(_dt);
+end
 
+function Player.HandleDamage(_dt)
   if Player.DamageTimer > 0 then
     Player.DamageTimer = Player.DamageTimer - _dt;
     Player.SetXVelocity(0);
@@ -194,23 +255,9 @@ function Player.Update(_dt)
   else
     Player.Sprite:SetColor(255,255,255,255);
   end
+end
 
-  if Player.IntroTimer > 0 or Player.Destroy == true or Player.DamageTimer > 0 then
-    -- Do nothing
-  elseif (Player.IsCrouched == true and Player.IsGrounded == true) or Player.AimLock == true then
-    Player.SetXVelocity(0);
-  elseif Player.DashTimer <= 0 then
-    Player.DashTimer = 0;
-    Player.SetXVelocity(Player.MoveInput.x * Player.MoveSpeed);
-  else
-    Player.SetYVelocity(0);
-    Player.DashTimer = Player.DashTimer - _dt;
-  end
-
-  if Player.ShootTimer > 0 then
-    Player.ShootTimer = Player.ShootTimer - _dt;
-  end
-
+function Player.HandleAnimationState(_dt)
   if Player.IntroTimer > 0 then
     Player.IntroTimer = Player.IntroTimer - _dt;
     Player.Sprite.CurrentAnimation = 8;
@@ -239,23 +286,36 @@ function Player.Update(_dt)
     if Player.RigidBody:GetXSpeed() > 0.01 then
       Player.Sprite.CurrentAnimation = 9;
     else
-      Player.Sprite.CurrentAnimation = 17;
+      Player.HandleIdleShootAnims();
     end
   elseif Player.RigidBody:GetXSpeed() > 0.01 then
     Player.Sprite.CurrentAnimation = 2;
+  elseif Player.Input.y < 0 then
+    Player.Sprite.CurrentAnimation = 13;
   else
     Player.Sprite.CurrentAnimation = 1;
   end
+end
 
-  if Player.Health <= 0 then
-    if Player.DeathTimer > 0 then
-      Player.DeathTimer = Player.DeathTimer - _dt;
-      Player.Sprite.CurrentAnimation = 11;
-      Player.SetYVelocity(0);
-      Player.SetXVelocity(0);
-    else
-      Player.Destroy = true;
-    end
+function Player.HandleIdleShootAnims()
+  if Player.Input.y < 0 and Player.Input.x == 0 then
+    Player.Sprite.CurrentAnimation = 18;
+  else
+    Player.Sprite.CurrentAnimation = 17;
+  end
+end
+
+function Player.Movement(_dt)
+  if Player.IntroTimer > 0 or Player.Destroy == true or Player.DamageTimer > 0 then
+    -- Do nothing
+  elseif (Player.IsCrouched == true and Player.IsGrounded == true) or Player.AimLock == true then
+    Player.SetXVelocity(0);
+  elseif Player.DashTimer <= 0 then
+    Player.DashTimer = 0;
+    Player.SetXVelocity(Player.MoveInput.x * Player.MoveSpeed);
+  else
+    Player.SetYVelocity(0);
+    Player.DashTimer = Player.DashTimer - _dt;
   end
 end
 
@@ -330,6 +390,7 @@ end
 function Player.Draw()
   Player.Sprite:Draw();
   Player.RigidBody:Draw();
+  Player.ParticleSystem:Draw();
 end
 
 return Player;

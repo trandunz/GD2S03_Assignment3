@@ -67,7 +67,7 @@ function Scene_Boss:Update(_dt)
   self.AudioManager:Update();
 
   self.World:Update(_dt);
-  if self.GameOver == false then
+  if self.GameOver == false and not self.PauseMenu then
     Player.GrabInput();
     Player.Update(_dt);
   end
@@ -76,24 +76,47 @@ function Scene_Boss:Update(_dt)
   ProjectileManager.Update(_dt);
   EnemyManager.Update(_dt);
 
+  if self.PauseMenu then
+    self.PauseMenu:Update(_dt);
+  end
+
+  self:CheckForPauseMenuClosed();
   self:CheckForPlayerDeath();
   self:CheckForPlayerWin();
 end
 
 function Scene_Boss:KeyEvents( key, scancode, isrepeat )
-  if Player then
-    Player.KeyEvents(key, scancode, isrepeat);
+  if self.PauseMenu then
+    self.PauseMenu:KeyEvents(key, scancode, isrepeat);
+  else
+    if Player then
+      Player.KeyEvents(key, scancode, isrepeat);
+    end
   end
 
-  if key == "1" then
-    TimeScale = 0;
-  elseif key == "2" then
-    TimeScale = 1;
+  if key == "escape" then
+    if self.PauseMenu then
+      self.PauseMenu:Cleanup();
+      self.PauseMenu = nil;
+    else
+      self.PauseMenu = require("PauseMenu"):new();
+      self.PauseMenu:Create();
+    end
+  end
+end
+
+function Scene_Boss:CheckForPauseMenuClosed()
+  if self.PauseMenu then
+    if self.PauseMenu.Destroy == true then
+      self.PauseMenu:Cleanup();
+      self.PauseMenu =  nil;
+    end
   end
 end
 
 function Scene_Boss:CheckForPlayerWin()
   if EnemyManager.GetEnemyCount() <= 0 and Player.Destroy == false then
+    self.GameOver = true;
     LevelLoader:LoadLevel("Scene_YouWin");
     Player.Cleanup();
   end
@@ -137,6 +160,9 @@ function Scene_Boss:Draw()
   ProjectileManager.Draw();
 
   GUI:Draw();
+  if self.PauseMenu then
+    self.PauseMenu:Draw();
+  end
 end
 
 return Scene_Boss;

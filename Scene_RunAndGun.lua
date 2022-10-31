@@ -8,7 +8,8 @@ Player = require("Player");
 
 function Scene:new(_scene)
   _scene = _scene or {World = require("World"):new(), Sky = require("Sprite"):new(),
-Map = STI("Resources/Tilemaps/Tutorial.lua"), Platforms = {}, Floor = {}, Destructables = {}, Interactables = {},AudioManager = require("AudioManager"):new(), GameOver = false};
+Map = STI("Resources/Tilemaps/Tutorial.lua"), Platforms = {}, Floor = {}, Destructables = {}, Interactables = {},AudioManager = require("AudioManager"):new(), GameOver = false,
+PauseMenu};
   setmetatable(_scene, self);
   self.__index = self;
   return _scene;
@@ -104,7 +105,7 @@ function Scene:Update(_dt)
   self.Map:update(_dt);
 
   self.World:Update(_dt);
-  if self.GameOver == false then
+  if self.GameOver == false and not self.PauseMenu then
     Player.GrabInput();
     Player.Update(_dt);
     if Player.GetPosition().x >= WindowSize.x /2 and Player.GetPosition().x <= 4450 then
@@ -116,18 +117,39 @@ function Scene:Update(_dt)
   ProjectileManager.Update(_dt);
   EnemyManager.Update(_dt);
 
+  if self.PauseMenu then
+    self.PauseMenu:Update(_dt);
+  end
+  self:CheckForPauseMenuClosed();
   self:CheckForPlayerDeath();
 end
 
 function Scene:KeyEvents( key, scancode, isrepeat )
-  if Player then
-    Player.KeyEvents(key, scancode, isrepeat);
+  if self.PauseMenu then
+    self.PauseMenu:KeyEvents(key, scancode, isrepeat);
+  else
+    if Player then
+      Player.KeyEvents(key, scancode, isrepeat);
+    end
   end
 
-  if key == "1" then
-    TimeScale = 0;
-  elseif key == "2" then
-    TimeScale = 1;
+  if key == "escape" then
+    if self.PauseMenu then
+      self.PauseMenu:Cleanup();
+      self.PauseMenu = nil;
+    else
+      self.PauseMenu = require("PauseMenu"):new();
+      self.PauseMenu:Create();
+    end
+  end
+end
+
+function Scene:CheckForPauseMenuClosed()
+  if self.PauseMenu then
+    if self.PauseMenu.Destroy == true then
+      self.PauseMenu:Cleanup();
+      self.PauseMenu =  nil;
+    end
   end
 end
 
@@ -188,6 +210,10 @@ function Scene:Draw()
   self.camera:detach();
 
   GUI:Draw();
+
+  if self.PauseMenu then
+    self.PauseMenu:Draw();
+  end
 end
 
 return Scene;

@@ -37,6 +37,7 @@ function EnemyManager.ForceCleanup()
     EnemyManager.Enemies[i]:Cleanup();
     EnemyManager.Enemies[i] = nil;
   end
+  EnemyManager.EnemyCount = 0;
   collectgarbage("collect");
 end
 

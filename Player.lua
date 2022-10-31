@@ -161,6 +161,10 @@ function Player.AttemptParry()
     Player.ParryableProjectile.ParryAnimTimer = 0.2;
     Player.ParryableProjectile = nil;
     Player.ParryTimer = 0;
+
+    math.randomseed(os.time());
+    local randomSound = math.random(1,2);
+    Player.AudioManager:CreateSound("Slap", "Resources/Sounds/Player/Slap (".. randomSound .. ").wav", true, false);
   end
 end
 

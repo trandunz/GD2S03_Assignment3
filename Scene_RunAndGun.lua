@@ -1,3 +1,12 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Scene_RunAndGun.lua
+--Description : Scene_RunAndGun Implementation File
+--Author : Will Inman
+
 local Scene = {};
 ProjectileManager = require("ProjectileManager");
 EnemyManager = require("EnemyManager");
@@ -57,12 +66,6 @@ function Scene:Start()
     local rigidBody = require("RigidBody"):new();
     rigidBody:SetWorld(self.World.world);
     rigidBody:CreateCube(obj.x, obj.y, obj.width, obj.height, "static", 0, "floor", obj.width / 2, obj.height / 2);
-    table.insert(self.Floor, rigidBody);
-  end
-  for i, obj in pairs(self.Map.layers["Walls"].objects) do
-    local rigidBody = require("RigidBody"):new();
-    rigidBody:SetWorld(self.World.world);
-    rigidBody:CreateCube(obj.x, obj.y, obj.width, obj.height, "static", 0, "walls", obj.width / 2, obj.height / 2);
     table.insert(self.Floor, rigidBody);
   end
   for i, obj in pairs(self.Map.layers["Platforms"].objects) do

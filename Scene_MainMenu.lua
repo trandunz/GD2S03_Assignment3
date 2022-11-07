@@ -1,10 +1,19 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Scene_MainMenu.lua
+--Description : Scene_MainMenu Implementation File
+--Author : Will Inman
+
 local MainMenu = {};
 
 local GUI = require("GUI");
 
 function MainMenu:new(_mainMenu)
   _mainMenu = _mainMenu or {BG = require("Sprite"):new(), Play = require("Text"):new(),Options = require("Text"):new(),Exit = require("Text"):new(), MenuSelection = 0,
-AudioManager = require("AudioManager"):new()};
+AudioManager = require("AudioManager"):new(), OptionsMenu};
   setmetatable(_mainMenu, self);
   self.__index = self;
   return _mainMenu;
@@ -13,6 +22,11 @@ end
 function MainMenu:Cleanup()
   self.AudioManager:ForceCleanup();
   GUI:Cleanup();
+
+  if self.OptionsMenu then
+    self.OptionsMenu:Cleanup();
+    self.OptionsMenu = nil;
+  end
 end
 
 function MainMenu:Start()
@@ -38,16 +52,25 @@ function MainMenu:Update(_dt)
 
   self.AudioManager:Update();
 
-  GUI.Elements.Play:SetColor(150,150,150);
-  GUI.Elements.Options:SetColor(150,150,150);
-  GUI.Elements.Exit:SetColor(150,150,150);
+  if self.OptionsMenu then
+    self.OptionsMenu:Update(_dt);
 
-  if self.MenuSelection == 0 then
-    GUI.Elements.Play:SetColor(255,255,255);
-  elseif self.MenuSelection == 1 then
-    GUI.Elements.Options:SetColor(255,255,255);
-  elseif self.MenuSelection == 2 then
-    GUI.Elements.Exit:SetColor(255,255,255);
+    if self.OptionsMenu.Destroy then
+      self.OptionsMenu:Cleanup();
+      self.OptionsMenu = nil;
+    end
+  else
+    GUI.Elements.Play:SetColor(150,150,150);
+    GUI.Elements.Options:SetColor(150,150,150);
+    GUI.Elements.Exit:SetColor(150,150,150);
+
+    if self.MenuSelection == 0 then
+      GUI.Elements.Play:SetColor(255,255,255);
+    elseif self.MenuSelection == 1 then
+      GUI.Elements.Options:SetColor(255,255,255);
+    elseif self.MenuSelection == 2 then
+      GUI.Elements.Exit:SetColor(255,255,255);
+    end
   end
 end
 
@@ -55,38 +78,59 @@ function MainMenu:KeyEvents( key, scancode, isrepeat )
   math.randomseed(os.time());
   local randomSound = math.random(1,3);
 
-  if key == "6" then
-    LevelLoader:LoadLevel("Scene_YouWin");
-  end
+  if self.OptionsMenu then
+    self.OptionsMenu:KeyEvents(key, scancode, isrepeat);
 
-  if key == "up" then
-    self.AudioManager:CreateSound("Select", "Resources/Sounds/GUI/Select (".. randomSound .. ").wav", true, false);
-    self.MenuSelection = self.MenuSelection - 1;
-  end
-  if key == "down" then
-    self.AudioManager:CreateSound("Select", "Resources/Sounds/GUI/Select (".. randomSound .. ").wav", true, false);
-    self.MenuSelection = self.MenuSelection + 1;
-  end
-  if key == "return" then
-    self.AudioManager:CreateSound("Confirm", "Resources/Sounds/GUI/Confirm.wav", true, false);
-    if self.MenuSelection == 0 then
-      LevelLoader:LoadLevel("Scene_Overworld");
-    elseif self.MenuSelection == 1 then
-    elseif self.MenuSelection == 2 then
-      love.event.quit();
+    if key == "up" then
+      self.AudioManager:CreateSound("Select", "Resources/Sounds/GUI/Select (".. randomSound .. ").wav", true, false);
     end
-  end
+    if key == "down" then
+      self.AudioManager:CreateSound("Select", "Resources/Sounds/GUI/Select (".. randomSound .. ").wav", true, false);
+    end
+    if key == "return" then
+      self.AudioManager:CreateSound("Confirm", "Resources/Sounds/GUI/Confirm.wav", true, false);
+    end
+  else
+    if key == "6" then
+      LevelLoader:LoadLevel("Scene_YouWin");
+    end
 
-  if self.MenuSelection < 0 then
-    self.MenuSelection = 0;
-  elseif self.MenuSelection > 2 then
-    self.MenuSelection = 2;
+    if key == "up" then
+      self.AudioManager:CreateSound("Select", "Resources/Sounds/GUI/Select (".. randomSound .. ").wav", true, false);
+      self.MenuSelection = self.MenuSelection - 1;
+    end
+    if key == "down" then
+      self.AudioManager:CreateSound("Select", "Resources/Sounds/GUI/Select (".. randomSound .. ").wav", true, false);
+      self.MenuSelection = self.MenuSelection + 1;
+    end
+    if key == "return" then
+      self.AudioManager:CreateSound("Confirm", "Resources/Sounds/GUI/Confirm.wav", true, false);
+      if self.MenuSelection == 0 then
+        LevelLoader:LoadLevel("Scene_Overworld");
+      elseif self.MenuSelection == 1 then
+        self.OptionsMenu = require("OptionsMenu"):new();
+        self.OptionsMenu:Create();
+      elseif self.MenuSelection == 2 then
+        love.event.quit();
+      end
+    end
+
+    if self.MenuSelection < 0 then
+      self.MenuSelection = 0;
+    elseif self.MenuSelection > 2 then
+      self.MenuSelection = 2;
+    end
   end
 end
 
 function MainMenu:Draw()
     self.BG:Draw()
-    GUI:Draw();
+
+    if self.OptionsMenu then
+      self.OptionsMenu:Draw();
+    else
+      GUI:Draw();
+    end
 end
 
 return MainMenu;

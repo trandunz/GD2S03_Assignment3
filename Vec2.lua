@@ -1,3 +1,12 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Vec2.lua
+--Description : Vec2 Implementation File
+--Author : Will Inman
+
 local Vec2 = {};
 
 function Vec2:new(_vec2)

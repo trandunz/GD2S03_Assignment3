@@ -1,4 +1,13 @@
-Scene_YouLoose = {};
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Scene_YouLoose.lua
+--Description : Scene_YouLoose Implementation File
+--Author : Will Inman
+
+local Scene_YouLoose = {};
 
 function Scene_YouLoose:new(_youLoose)
   _youLoose = _youLoose or {BG = require("Sprite"):new(), Retry = require("Sprite"):new(),Options = require("Sprite"):new(),Exit = require("Sprite"):new(), MenuSelection = 0,
@@ -15,11 +24,10 @@ end
 function Scene_YouLoose:Start()
     self.AudioManager:CreateMusic("DeathMusic", "Resources/Music/Botanic_Death.mp3", true, true, "stream");
 
-    self.Retry:Create("Resources/Textures/GUI/Retry.png", WindowSize.x/2, (WindowSize.y/2) - 50);
+    self.Retry:Create("Resources/Textures/GUI/Retry.png", WindowSize.x/2, (WindowSize.y/2) - 25);
     self.Retry:SetColor(255,255,255);
-    self.Options:Create("Resources/Textures/GUI/Options.png", WindowSize.x/2, WindowSize.y/2);
-    self.Options:SetColor(150,150,150);
-    self.Exit:Create("Resources/Textures/GUI/Return.png", WindowSize.x/2, (WindowSize.y/2) + 50);
+
+    self.Exit:Create("Resources/Textures/GUI/Return.png", WindowSize.x/2, (WindowSize.y/2) + 25);
     self.Exit:SetColor(150,150,150);
 
     self.BG:Create("Resources/Textures/DeathImage.png", WindowSize.x/2, WindowSize.y/2);
@@ -32,14 +40,11 @@ function Scene_YouLoose:Update(_dt)
   self.AudioManager:Update();
 
   self.Retry:SetColor(150,150,150);
-  self.Options:SetColor(150,150,150);
   self.Exit:SetColor(150,150,150);
 
   if self.MenuSelection == 0 then
     self.Retry:SetColor(255,255,255);
   elseif self.MenuSelection == 1 then
-    self.Options:SetColor(255,255,255);
-  elseif self.MenuSelection == 2 then
     self.Exit:SetColor(255,255,255);
   end
 end
@@ -61,22 +66,20 @@ function Scene_YouLoose:KeyEvents( key, scancode, isrepeat )
     if self.MenuSelection == 0 then
       LevelLoader:LoadPreviousLevel();
     elseif self.MenuSelection == 1 then
-    elseif self.MenuSelection == 2 then
       LevelLoader:LoadLevel("Scene_Overworld");
     end
   end
 
   if self.MenuSelection < 0 then
     self.MenuSelection = 0;
-  elseif self.MenuSelection > 2 then
-    self.MenuSelection = 2;
+  elseif self.MenuSelection > 1 then
+    self.MenuSelection = 1;
   end
 end
 
 function Scene_YouLoose:Draw()
     self.BG:Draw();
     self.Retry:Draw();
-    self.Options:Draw();
     self.Exit:Draw();
 end
 

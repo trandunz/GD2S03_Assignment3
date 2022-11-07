@@ -1,3 +1,12 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Onion.lua
+--Description : Onion Implementation File
+--Author : Will Inman
+
 local Onion = {};
 
 function Onion:new(_onion)

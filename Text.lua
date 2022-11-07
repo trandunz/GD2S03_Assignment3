@@ -1,3 +1,12 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Text.lua
+--Description : Text Implementation File
+--Author : Will Inman
+
 local Text = {};
 
 function Text:new(_text)

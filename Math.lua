@@ -1,3 +1,12 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Math.lua
+--Description : Math Implementation File
+--Author : Will Inman
+
 local Math = {};
 
 function Math:Lerp(_a, _b, _t)

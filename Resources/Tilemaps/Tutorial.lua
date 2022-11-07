@@ -314,23 +314,7 @@ return {
           rotation = 0,
           visible = true,
           properties = {}
-        }
-      }
-    },
-    {
-      type = "objectgroup",
-      draworder = "topdown",
-      id = 5,
-      name = "Walls",
-      class = "",
-      visible = true,
-      opacity = 1,
-      offsetx = 0,
-      offsety = 0,
-      parallaxx = 1,
-      parallaxy = 1,
-      properties = {},
-      objects = {
+        },
         {
           id = 19,
           name = "",
@@ -375,8 +359,8 @@ return {
           name = "",
           class = "",
           shape = "rectangle",
-          x = 1902.67,
-          y = 576,
+          x = 1910,
+          y = 576.333,
           width = 2.33333,
           height = 368,
           rotation = 0,

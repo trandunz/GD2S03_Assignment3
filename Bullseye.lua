@@ -1,5 +1,15 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Bullseye.lua
+--Description : Bullseye Implementation File
+--Author : Will Inman
+
 local Bullseye = {};
 
+-- returns a new instance of a bullseye enemy
 function Bullseye:new(_bullseye)
   _bullseye = _bullseye or {Sprite = require("AnimatedSprite"):new(), RigidBody = require("RigidBody"):new(), Health = 10, Destroy = false, DamageTimer = 0, DamageInterval = 0.2};
   setmetatable(_bullseye, self);
@@ -7,6 +17,7 @@ function Bullseye:new(_bullseye)
   return _bullseye;
 end
 
+-- Initializes the bullseye enemy
 function Bullseye:Create(_xPos, _yPos, _world)
   self.Sprite:Create("Resources/Textures/Tutorial/Target.png", _xPos, _yPos, 77 ,91);
   self.Sprite:AddAnimation('1-5', 0.06);
@@ -17,6 +28,7 @@ function Bullseye:Create(_xPos, _yPos, _world)
   self.RigidBody:SetFixedToRotation(true);
 end
 
+-- update the bullseye enemy
 function Bullseye:Update(_dt)
   if self.Destroy == false then
     self.Sprite.XPos = self.RigidBody:GetPosition().x;
@@ -33,6 +45,7 @@ function Bullseye:Update(_dt)
   end
 end
 
+-- handles the bullseye taking damage
 function Bullseye:TakeDamage(_amount)
   if self.Health > 0 then
     if self.DamageTimer <= 0 then
@@ -45,10 +58,12 @@ function Bullseye:TakeDamage(_amount)
   end
 end
 
+-- Cleans up the bullseye enemy
 function Bullseye:Cleanup()
   self.RigidBody:Destroy();
 end
 
+-- Draw the bullseye enemy
 function Bullseye:Draw()
   if self.Destroy == false then
     self.Sprite:Draw();

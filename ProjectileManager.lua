@@ -1,3 +1,12 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : ProjectileManager.lua
+--Description : ProjectileManager Implementation File
+--Author : Will Inman
+
 local ProjectileManager = {Projectiles = {}, ProjectileCount = 0, AudioManager = require("AudioManager"):new()};
 
 function ProjectileManager.CreateProjectile(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _isFriendly, _damage, _type, _canParry)

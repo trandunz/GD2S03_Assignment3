@@ -1,6 +1,16 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Player.lua
+--Description : Player Implementation File
+--Author : Will Inman
+
 local Player = {Sprite, MoveSpeed = 20, JumpHeight = 4000, MoveInput, Input, RigidBody, IsGrounded = false, DashDuration = 0.34, DashTimer = 0, DashSpeed = 50, IsCrouched = false,
 CrouchDuration = 0.28, CrouchTimer = 0, ShootDuration = 0.24, ShootTimer = 0, Health = 3, IntroTimer = 1.62, DamageTimer = 0, DamageInterval = 0.24, ElapsedTime = 0,
-AudioManager, Destroy = false, DeathTimer = 0.64, AimLock = false, ParryTimer = 0, ParryLeway = 0.1, ParryableProjectile, ParticleSystem = require("ParticleSystem"):new()};
+AudioManager, Destroy = false, DeathTimer = 0.64, AimLock = false, ParryTimer = 0, ParryLeway = 0.1, ParryableProjectile, ParticleSystem = require("ParticleSystem"):new(),
+GroundRayDistance = 90, RayHit = {}};
 
 function Player.Create(_xPos, _yPos, _world)
   Player.Sprite = require("AnimatedSprite"):new();
@@ -226,6 +236,7 @@ function Player.Update(_dt)
 
   Player.SetSpritePositionToRigidBody(_dt);
   Player.HandleDamage(_dt);
+  Player.GroundCheck();
   Player.Movement(_dt);
   Player.HandleAnimationState(_dt);
   Player.CheckForDeath(_dt);
@@ -323,6 +334,34 @@ function Player.Movement(_dt)
   end
 end
 
+function Player.GroundCheck()
+  Player.RayHit = {};
+  Player.RigidBody.World:rayCast(Player.GetPosition().x + (Player.RigidBody.sizeX / 2), Player.GetPosition().y, Player.GetPosition().x + (Player.RigidBody.sizeX / 2), Player.GetPosition().y + Player.GroundRayDistance, Player.WorldRayCastCallback);
+  Player.RigidBody.World:rayCast(Player.GetPosition().x - (Player.RigidBody.sizeX / 2), Player.GetPosition().y, Player.GetPosition().x - (Player.RigidBody.sizeX / 2), Player.GetPosition().y + Player.GroundRayDistance, Player.WorldRayCastCallback);
+  Player.RigidBody.World:rayCast(Player.GetPosition().x, Player.GetPosition().y, Player.GetPosition().x, Player.GetPosition().y + Player.GroundRayDistance, Player.WorldRayCastCallback);
+
+  local count = 0;
+  for _ in pairs(Player.RayHit) do count = count + 1 end
+
+  if count <= 0 then
+    Player.IsGrounded = false;
+    else
+      for k, v in pairs(Player.RayHit) do
+        if v:getUserData() == "floor" then
+          Player.IsGrounded = true;
+          break
+        else
+          Player.IsGrounded = false;
+        end
+      end
+    end
+end
+
+function Player.WorldRayCastCallback(fixture, x, y, xn, yn, fraction)
+  table.insert(Player.RayHit, fixture);
+	return 1;
+end
+
 function Player.HandleAimLockAnims()
   if Player.ShootTimer <= 0 then
     if Player.Input.x ~= 0 and Player.Input.y == 0 then
@@ -395,6 +434,12 @@ function Player.Draw()
   Player.Sprite:Draw();
   Player.RigidBody:Draw();
   Player.ParticleSystem:Draw();
+
+  if DebugDraw == true then
+    love.graphics.line(Player.GetPosition().x + (Player.RigidBody.sizeX / 2), Player:GetPosition().y, Player.GetPosition().x + Player.RigidBody.sizeX  / 2, Player:GetPosition().y + Player.GroundRayDistance)
+    love.graphics.line(Player.GetPosition().x - (Player.RigidBody.sizeX  / 2), Player:GetPosition().y, Player.GetPosition().x - Player.RigidBody.sizeX  / 2, Player:GetPosition().y + Player.GroundRayDistance)
+    love.graphics.line(Player:GetPosition().x, Player:GetPosition().y, Player:GetPosition().x, Player:GetPosition().y + Player.GroundRayDistance)
+  end
 end
 
 return Player;

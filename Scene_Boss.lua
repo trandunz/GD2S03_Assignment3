@@ -1,3 +1,12 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Scene_Boss.lua
+--Description : Scene_Boss Implementation File
+--Author : Will Inman
+
 local Scene_Boss = {};
 
 ProjectileManager = require("ProjectileManager");

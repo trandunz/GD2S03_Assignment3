@@ -1,3 +1,12 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : Lober.lua
+--Description : Lober Implementation File
+--Author : Will Inman
+
 local Lober = {};
 
 function Lober:new(_lober)

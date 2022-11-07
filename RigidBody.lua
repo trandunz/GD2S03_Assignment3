@@ -1,3 +1,12 @@
+--Bachelor of Software Engineering
+--Media Design School
+--Auckland
+--New Zealand
+--(c) Media Design School
+--File Name : RigidBody.lua
+--Description : RigidBody Implementation File
+--Author : Will Inman
+
 local RigidBody = {};
 
 function RigidBody:new(_rigidBody)

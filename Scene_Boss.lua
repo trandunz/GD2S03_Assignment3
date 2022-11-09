@@ -15,6 +15,7 @@ local STI = require("STI/sti");
 local GUI = require("GUI");
 Player = require("Player");
 
+-- Returns a new instance of scene_boss
 function Scene_Boss:new(_scene)
   _scene = _scene or {World = require("World"):new(), Sky = require("Sprite"):new(), BG = require("Sprite"):new(), Floor = require("RigidBody"):new(),
 LeftBound = require("RigidBody"):new(), RightBound = require("RigidBody"):new(), AudioManager = require("AudioManager"):new(), GameOver = false};
@@ -23,6 +24,7 @@ LeftBound = require("RigidBody"):new(), RightBound = require("RigidBody"):new(),
   return _scene;
 end
 
+-- cleans up the scene
 function Scene_Boss:Cleanup()
   self.AudioManager:ForceCleanup();
   GUI:Cleanup();
@@ -34,6 +36,7 @@ function Scene_Boss:Cleanup()
   Player = nil;
 end
 
+-- Initializes the scene
 function Scene_Boss:Start()
   GUI = require("GUI"):new();
   ProjectileManager = require("ProjectileManager");
@@ -68,6 +71,7 @@ function Scene_Boss:Start()
   EnemyManager.CreateOnion(WindowSize.x / 2, WindowSize.y - 300);
 end
 
+-- updates the scene
 function Scene_Boss:Update(_dt)
   EnemyManager.CleanupDestroyedEnemies();
   ProjectileManager.CleanupDestroyedProjectiles();
@@ -94,6 +98,7 @@ function Scene_Boss:Update(_dt)
   self:CheckForPlayerWin();
 end
 
+-- recieves key events from love key callback
 function Scene_Boss:KeyEvents( key, scancode, isrepeat )
   if self.PauseMenu then
     self.PauseMenu:KeyEvents(key, scancode, isrepeat);
@@ -114,6 +119,7 @@ function Scene_Boss:KeyEvents( key, scancode, isrepeat )
   end
 end
 
+-- checks if the puae manu has been closed and cleans it up
 function Scene_Boss:CheckForPauseMenuClosed()
   if self.PauseMenu then
     if self.PauseMenu.Destroy == true then
@@ -123,6 +129,7 @@ function Scene_Boss:CheckForPauseMenuClosed()
   end
 end
 
+-- checks if the player has won
 function Scene_Boss:CheckForPlayerWin()
   if EnemyManager.GetEnemyCount() <= 0 and Player.Destroy == false then
     self.GameOver = true;
@@ -131,6 +138,7 @@ function Scene_Boss:CheckForPlayerWin()
   end
 end
 
+-- checks for player death
 function Scene_Boss:CheckForPlayerDeath()
   if Player then
     if Player.Destroy == true and self.GameOver == false then
@@ -141,6 +149,7 @@ function Scene_Boss:CheckForPlayerDeath()
   end
 end
 
+-- updates the players health UI
 function Scene_Boss:UpdatePlayerHPGUI()
   if Player ~= nil then
     if Player.Health >= 3 then
@@ -155,6 +164,7 @@ function Scene_Boss:UpdatePlayerHPGUI()
   end
 end
 
+-- draws the scene
 function Scene_Boss:Draw()
   self.Sky:Draw();
 

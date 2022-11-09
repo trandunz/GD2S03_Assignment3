@@ -15,6 +15,7 @@ local HUMP = require("hump/camera");
 local GUI = require("GUI");
 Player = require("Player");
 
+-- returns a new instance of sthe run and gun scene
 function Scene:new(_scene)
   _scene = _scene or {World = require("World"):new(), Sky = require("Sprite"):new(),
 Map = STI("Resources/Tilemaps/Tutorial.lua"), Platforms = {}, Floor = {}, Destructables = {}, Interactables = {},AudioManager = require("AudioManager"):new(), GameOver = false,
@@ -24,6 +25,7 @@ PauseMenu};
   return _scene;
 end
 
+-- cleans up the scene
 function Scene:Cleanup()
   self.AudioManager:ForceCleanup();
   GUI:Cleanup();
@@ -35,6 +37,7 @@ function Scene:Cleanup()
   Player = nil;
 end
 
+-- Initializes the scene
 function Scene:Start()
   GUI = require("GUI"):new();
   ProjectileManager = require("ProjectileManager");
@@ -88,6 +91,7 @@ function Scene:Start()
   end
 end
 
+-- updates the scene
 function Scene:Update(_dt)
   EnemyManager.CleanupDestroyedEnemies();
   ProjectileManager.CleanupDestroyedProjectiles();
@@ -127,6 +131,7 @@ function Scene:Update(_dt)
   self:CheckForPlayerDeath();
 end
 
+-- recieves key events from love key callback
 function Scene:KeyEvents( key, scancode, isrepeat )
   if self.PauseMenu then
     self.PauseMenu:KeyEvents(key, scancode, isrepeat);
@@ -147,6 +152,7 @@ function Scene:KeyEvents( key, scancode, isrepeat )
   end
 end
 
+-- checks if the pause menu is closed and destroys it accordingly
 function Scene:CheckForPauseMenuClosed()
   if self.PauseMenu then
     if self.PauseMenu.Destroy == true then
@@ -156,6 +162,7 @@ function Scene:CheckForPauseMenuClosed()
   end
 end
 
+-- checks for player death
 function Scene:CheckForPlayerDeath()
   if Player then
     if Player.Destroy == true and self.GameOver == false then
@@ -166,6 +173,7 @@ function Scene:CheckForPlayerDeath()
   end
 end
 
+-- updates the players health UI
 function Scene:UpdatePlayerHPGUI()
   if Player ~= nil then
     if Player.Health >= 3 then
@@ -180,6 +188,7 @@ function Scene:UpdatePlayerHPGUI()
   end
 end
 
+-- draws the scene
 function Scene:Draw()
   self.Sky:Draw();
 

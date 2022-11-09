@@ -11,6 +11,7 @@ local OptionsMenu = {};
 
 local GUI = require("GUI");
 
+-- returns a new instance of a OptionsMenu
 function OptionsMenu:new(_optionsMenu)
   _optionsMenu = _optionsMenu or {AudioManager = require("AudioManager"):new(), MenuSelection = 0, Destroy = false};
   setmetatable(_optionsMenu, self);
@@ -18,6 +19,7 @@ function OptionsMenu:new(_optionsMenu)
   return _optionsMenu;
 end
 
+-- initialize the OptionsMenu
 function OptionsMenu:Create()
   GUI = require("GUI"):new();
   self.BG = require("Sprite"):new();
@@ -45,6 +47,7 @@ function OptionsMenu:Create()
   GUI.Elements.EffectsCounter:SetScale(0.8,0.8);
 end
 
+-- Updates the OptionsMenu every frame
 function OptionsMenu:Update(_dt)
   self.AudioManager:Update();
 
@@ -68,6 +71,7 @@ function OptionsMenu:Update(_dt)
   end
 end
 
+-- Recieves key events from love key callback
 function OptionsMenu:KeyEvents( key, scancode, isrepeat )
   math.randomseed(os.time());
   local randomSound = math.random(1,3);
@@ -130,11 +134,13 @@ function OptionsMenu:KeyEvents( key, scancode, isrepeat )
   end
 end
 
+-- Cleans up the options menu
 function OptionsMenu:Cleanup()
   GUI:Cleanup();
   self.AudioManager:ForceCleanup();
 end
 
+-- Draw the options menu
 function OptionsMenu:Draw()
     self.BG:Draw()
     GUI:Draw();

@@ -9,6 +9,7 @@
 
 local Vec2 = {};
 
+-- returns a new vector2 instance
 function Vec2:new(_vec2)
   _vec2 = _vec2 or {x = 0.0, y = 0.0};
   setmetatable(_vec2, self);
@@ -16,6 +17,7 @@ function Vec2:new(_vec2)
   return _vec2;
 end
 
+-- normalizes the vector
 function Vec2:Normalize()
   if self:Mag() ~= 0.0 then
     mag = self:Mag();
@@ -26,10 +28,12 @@ function Vec2:Normalize()
   return self;
 end
 
+-- returns the magnitude of the vector
 function Vec2:Mag()
   return math.sqrt((self.x * self.x) + (self.y * self.y));
 end
 
+-- overloads the + operator
 function Vec2.__add(_vec1, _vec2)
   local output = Vec2:new();
   output.x = _vec1.x + _vec2.x;
@@ -37,6 +41,7 @@ function Vec2.__add(_vec1, _vec2)
   return output;
 end
 
+-- overloads the - operator
 function Vec2.__sub(_vec1, _vec2)
   local output = Vec2:new();
   output.x = _vec1.x - _vec2.x;
@@ -44,6 +49,7 @@ function Vec2.__sub(_vec1, _vec2)
   return output;
 end
 
+-- overloads the * operator
 function Vec2.__mul(_vec1, _factor)
   local output = Vec2:new();
   output.x = _vec1.x * _factor;

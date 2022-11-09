@@ -9,9 +9,9 @@
 
 local Player = {Sprite, MoveSpeed = 20, JumpHeight = 4000, MoveInput, Input, RigidBody, IsGrounded = false, DashDuration = 0.34, DashTimer = 0, DashSpeed = 50, IsCrouched = false,
 CrouchDuration = 0.28, CrouchTimer = 0, ShootDuration = 0.24, ShootTimer = 0, Health = 3, IntroTimer = 1.62, DamageTimer = 0, DamageInterval = 0.24, ElapsedTime = 0,
-AudioManager, Destroy = false, DeathTimer = 0.64, AimLock = false, ParryTimer = 0, ParryLeway = 0.1, ParryableProjectile, ParticleSystem = require("ParticleSystem"):new(),
-GroundRayDistance = 90, RayHit = {}};
+AudioManager, Destroy = false, DeathTimer = 0.64, AimLock = false, ParryTimer = 0, ParryLeway = 0.1, ParryableProjectile, ParticleSystem, GroundRayDistance = 90, RayHit = {}};
 
+-- Initializes the player
 function Player.Create(_xPos, _yPos, _world)
   Player.Sprite = require("AnimatedSprite"):new();
   Player.MoveInput = require("Vec2"):new();
@@ -34,6 +34,8 @@ function Player.Create(_xPos, _yPos, _world)
   Player.AimLock = false
   Player.ParryTimer = 0;
   Player.CachedDamage = 0;
+  Player.ParryableProjectile = nil;
+  Player.ParticleSystem = require("ParticleSystem"):new();
 
   Player.ParticleSystem:Create("Resources/Textures/Peashooter/ExplosionDust.png",10000, _xPos, _yPos);
 
@@ -68,6 +70,7 @@ function Player.Create(_xPos, _yPos, _world)
   Player.AudioManager:CreateSound("Intro", "Resources/Sounds/Player/Intro.wav", true, false);
 end
 
+-- Handles caching input for the player
 function Player.GrabInput()
   Player.MoveInput.x = 0;
   Player.MoveInput.y = 0;
@@ -126,12 +129,14 @@ function Player.GrabInput()
   end
 end
 
+-- Resets all movement timers
 function Player.ResetMovementTimers()
   Player.ShootTimer = 0;
   Player.CrouchTimer = 0;
   Player.DashTimer = 0;
 end
 
+-- Recieves key events coming in from loves key callback
 function Player.KeyEvents( key, scancode, isrepeat )
   if key == "z" then
     if Player.IsGrounded == true then
@@ -148,6 +153,7 @@ function Player.KeyEvents( key, scancode, isrepeat )
   end
 end
 
+-- Allows the player to take a specified amount of damage
 function Player.TakeDamage(_amount)
   if Player.Health > 0  and Player.DamageTimer <= 0 and _amount > 0 then
     math.randomseed(os.time());
@@ -165,6 +171,7 @@ function Player.TakeDamage(_amount)
   end
 end
 
+-- Attempts to parry a projectile
 function Player.AttemptParry()
   if Player.ParryTimer > 0 then
     Player.SetYVelocity(-45);
@@ -178,6 +185,7 @@ function Player.AttemptParry()
   end
 end
 
+-- Handles the jumping for the player
 function Player.Jump()
   if Player.IntroTimer <= 0 and Player.Destroy == false and Player.DamageTimer <= 0 and Player.AimLock == false then
     math.randomseed(os.time());
@@ -188,6 +196,7 @@ function Player.Jump()
   end
 end
 
+-- Handles player shooting
 function Player.Shoot()
   if Player.IntroTimer <= 0 and Player.Health > 0 and Player.DamageTimer <= 0 then
     if Player.AimLock == false then
@@ -207,6 +216,7 @@ function Player.Shoot()
   end
 end
 
+-- returns a float value that is used for the alpha lashing when you take damage
 function Player.AlphaFlashSin()
   return (math.sin(math.rad(Player.ElapsedTime * 4000)) * 125/2) + 125/2;
 end
@@ -220,6 +230,7 @@ function Player.Cleanup()
   Player.AudioManager:CreateSound("Death", "Resources/Sounds/Player/Death (".. randomSound .. ").wav", true, false);
 end
 
+-- Updates the player
 function Player.Update(_dt)
   Player.ElapsedTime = Player.ElapsedTime + _dt;
   if Player.ShootTimer > 0 then
@@ -243,6 +254,7 @@ function Player.Update(_dt)
 
 end
 
+-- Handles and checks for player death
 function Player.CheckForDeath(_dt)
   if Player.Health <= 0 then
     if Player.DeathTimer > 0 then
@@ -256,12 +268,14 @@ function Player.CheckForDeath(_dt)
   end
 end
 
+-- sets the sprite position too that of the rigid bodies
 function Player.SetSpritePositionToRigidBody(_dt)
   Player.Sprite.XPos = Player.RigidBody:GetPosition().x;
   Player.Sprite.YPos = Player.RigidBody:GetPosition().y;
   Player.Sprite:Update(_dt);
 end
 
+-- Handles sprite flash and damage cooldown
 function Player.HandleDamage(_dt)
   if Player.DamageTimer > 0 then
     Player.DamageTimer = Player.DamageTimer - _dt;
@@ -272,6 +286,7 @@ function Player.HandleDamage(_dt)
   end
 end
 
+-- Handles the picking and choosing for the current animation
 function Player.HandleAnimationState(_dt)
   if Player.IntroTimer > 0 then
     Player.IntroTimer = Player.IntroTimer - _dt;
@@ -312,6 +327,7 @@ function Player.HandleAnimationState(_dt)
   end
 end
 
+-- Determins the idle shooting animation
 function Player.HandleIdleShootAnims()
   if Player.Input.y < 0 and Player.Input.x == 0 then
     Player.Sprite.CurrentAnimation = 18;
@@ -320,6 +336,7 @@ function Player.HandleIdleShootAnims()
   end
 end
 
+-- Handles player movement
 function Player.Movement(_dt)
   if Player.IntroTimer > 0 or Player.Destroy == true or Player.DamageTimer > 0 then
     -- Do nothing
@@ -334,6 +351,7 @@ function Player.Movement(_dt)
   end
 end
 
+-- Checks for ground an sets player.Isgrounded to true and false accordingly
 function Player.GroundCheck()
   Player.RayHit = {};
   Player.RigidBody.World:rayCast(Player.GetPosition().x + (Player.RigidBody.sizeX / 2), Player.GetPosition().y, Player.GetPosition().x + (Player.RigidBody.sizeX / 2), Player.GetPosition().y + Player.GroundRayDistance, Player.WorldRayCastCallback);
@@ -357,11 +375,13 @@ function Player.GroundCheck()
     end
 end
 
+-- Callback for ground check raycast
 function Player.WorldRayCastCallback(fixture, x, y, xn, yn, fraction)
   table.insert(Player.RayHit, fixture);
 	return 1;
 end
 
+-- Picks the correct animation for aimlock accordingly
 function Player.HandleAimLockAnims()
   if Player.ShootTimer <= 0 then
     if Player.Input.x ~= 0 and Player.Input.y == 0 then
@@ -394,30 +414,37 @@ function Player.HandleAimLockAnims()
   end
 end
 
+-- sets the velocity of the rigidbody
 function Player.SetVelocity(_amount)
   Player.RigidBody:SetVelocity(_amount.x * Player.MoveSpeed, _amount.y * Player.MoveSpeed);
 end
 
+-- sets the x velocity of the rigid body
 function Player.SetXVelocity(_amount)
   Player.RigidBody:SetVelocity(_amount * Player.MoveSpeed,  Player.RigidBody:GetVelocity().y);
 end
 
+-- sets the y velocity of the rigid body
 function Player.SetYVelocity(_amount)
   Player.RigidBody:SetVelocity(Player.RigidBody:GetVelocity().x,  _amount * Player.MoveSpeed);
 end
 
+-- applies a linear impulse to the rigid body
 function Player.ApplyLinearImpulse(_amount)
   Player.RigidBody:ApplyLinearImpulse(_amount.x, _amount.y);
 end
 
+-- applies a linear impulse to the rigid body
 function Player.ApplyLinearImpulse(_x, _y)
   Player.RigidBody:ApplyLinearImpulse(_x, _y);
 end
 
+-- returns the players position
 function Player.GetPosition()
   return Player.Sprite:GetPosition();
 end
 
+-- handles the player dash
 function Player.Dash()
   if  Player.DashTimer <= 0 and Player.IntroTimer <= 0 and Player.Destroy == false and Player.DamageTimer <= 0 then
     math.randomseed(os.time());
@@ -430,6 +457,7 @@ function Player.Dash()
   end
 end
 
+-- Draws the player
 function Player.Draw()
   Player.Sprite:Draw();
   Player.RigidBody:Draw();

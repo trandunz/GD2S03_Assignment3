@@ -9,12 +9,14 @@
 
 local ProjectileManager = {Projectiles = {}, ProjectileCount = 0, AudioManager = require("AudioManager"):new()};
 
+-- Creates a projectile with the specified paramters
 function ProjectileManager.CreateProjectile(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _isFriendly, _damage, _type, _canParry)
   ProjectileManager.ProjectileCount = ProjectileManager.ProjectileCount + 1;
   ProjectileManager.Projectiles[ProjectileManager.ProjectileCount] = require("Projectile"):new();
   ProjectileManager.Projectiles[ProjectileManager.ProjectileCount]:Create(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _isFriendly, _damage, _type, _canParry);
 end
 
+-- updates all projectiles
 function ProjectileManager.Update(_dt)
   ProjectileManager.AudioManager:Update();
   for i, v in pairs(ProjectileManager.Projectiles) do
@@ -22,6 +24,7 @@ function ProjectileManager.Update(_dt)
   end
 end
 
+-- force cleans up all projectiles
 function ProjectileManager.ForceCleanup()
   for i, v in pairs(ProjectileManager.Projectiles) do
     ProjectileManager.Projectiles[i]:Cleanup();
@@ -30,6 +33,7 @@ function ProjectileManager.ForceCleanup()
   collectgarbage("collect");
 end
 
+-- checks if any particles are marked for destroy, destroy them
 function ProjectileManager.CleanupDestroyedProjectiles()
   for i, v in pairs(ProjectileManager.Projectiles) do
     if ProjectileManager.Projectiles[i].Destroy == true then
@@ -51,6 +55,7 @@ function ProjectileManager.CleanupDestroyedProjectiles()
   collectgarbage("collect");
 end
 
+-- draw all projectiles
 function ProjectileManager.Draw()
   for i, v in pairs(ProjectileManager.Projectiles) do
     ProjectileManager.Projectiles[i]:Draw();

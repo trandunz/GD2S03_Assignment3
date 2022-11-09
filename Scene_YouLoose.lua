@@ -9,6 +9,7 @@
 
 local Scene_YouLoose = {};
 
+-- returns a new instance of scene_youLoose
 function Scene_YouLoose:new(_youLoose)
   _youLoose = _youLoose or {BG = require("Sprite"):new(), Retry = require("Sprite"):new(),Options = require("Sprite"):new(),Exit = require("Sprite"):new(), MenuSelection = 0,
 AudioManager = require("AudioManager"):new()};
@@ -17,10 +18,12 @@ AudioManager = require("AudioManager"):new()};
   return _youLoose;
 end
 
+-- cleans up the scene
 function Scene_YouLoose:Cleanup()
   self.AudioManager:ForceCleanup();
 end
 
+-- initializes the scene
 function Scene_YouLoose:Start()
     self.AudioManager:CreateMusic("DeathMusic", "Resources/Music/Botanic_Death.mp3", true, true, "stream");
 
@@ -34,6 +37,7 @@ function Scene_YouLoose:Start()
     self.BG:SetScale(0.91,0.91);
 end
 
+-- updates the scene
 function Scene_YouLoose:Update(_dt)
   LevelLoader:HandleSceneStartTransition(_dt);
 
@@ -49,6 +53,7 @@ function Scene_YouLoose:Update(_dt)
   end
 end
 
+-- recieves key events from love key callback
 function Scene_YouLoose:KeyEvents( key, scancode, isrepeat )
   math.randomseed(os.time());
   local randomSound = math.random(1,3);
@@ -77,6 +82,7 @@ function Scene_YouLoose:KeyEvents( key, scancode, isrepeat )
   end
 end
 
+-- draws the scene
 function Scene_YouLoose:Draw()
     self.BG:Draw();
     self.Retry:Draw();

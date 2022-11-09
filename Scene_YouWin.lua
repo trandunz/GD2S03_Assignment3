@@ -11,6 +11,7 @@ local Scene_YouWin = {};
 
 local GUI = require("GUI");
 
+-- returns a new instance of scene_youwin
 function Scene_YouWin:new(_youWin)
   _youWin = _youWin or {BG = require("Sprite"):new(), Cuphead = require("AnimatedSprite"):new(), AudioManager = require("AudioManager"):new(),
  Results = require("AnimatedSprite"):new(), Credit = require("Sprite"):new(), CupheadName = require("Sprite"):new(),
@@ -20,11 +21,13 @@ Board = require("Sprite"):new(), Line = require("Sprite"):new()};
   return _youWin;
 end
 
+-- cleans up the scene
 function Scene_YouWin:Cleanup()
   self.AudioManager:ForceCleanup();
   GUI:Cleanup();
 end
 
+-- initializes the scene
 function Scene_YouWin:Start()
     GUI = require("GUI"):new();
 
@@ -83,6 +86,7 @@ function Scene_YouWin:Start()
     GUI.Elements.GradeValue:SetScale(1.75,1.75);
 end
 
+-- updates the scene
 function Scene_YouWin:Update(_dt)
   LevelLoader:HandleSceneStartTransition(_dt);
 
@@ -93,6 +97,7 @@ function Scene_YouWin:Update(_dt)
   self.Results:Update(_dt);
 end
 
+-- recieves key events from love key callback
 function Scene_YouWin:KeyEvents( key, scancode, isrepeat )
   if key == "return" then
     self.AudioManager:CreateSound("Confirm", "Resources/Sounds/GUI/Confirm.wav", true, false);
@@ -100,6 +105,7 @@ function Scene_YouWin:KeyEvents( key, scancode, isrepeat )
   end
 end
 
+-- draws the scene
 function Scene_YouWin:Draw()
     self.BG:Draw();
     self.Cuphead:Draw();

@@ -9,6 +9,7 @@
 
 local Projectile = {};
 
+-- returns a new instance of a projectile
 function Projectile:new(_projectile)
   _projectile = _projectile or {Sprite = require("AnimatedSprite"):new(), RigidBody = require("RigidBody"):new(), Direction = require("Vec2"):new(), Speed, IsFriendly = true,
   Destroy = false, Damage = 1, AudioManager = require("AudioManager"):new(), Type, CanParry = false, ParryTimer = 0, ParryLeway = 0.05, Collided = false, ParryAnimTimer = 0,
@@ -18,6 +19,7 @@ ParticleSystem = require("ParticleSystem"):new(), ParticleEmitTimer = 0, Particl
   return _projectile;
 end
 
+-- Initializes the projectile
 function Projectile:Create(_xPos, _yPos, _world, _DirectionX, _DirectionY, _speed, _friendly, _damage, _type, _canParry)
   self.IsFriendly = _friendly;
   self.Speed = _speed;
@@ -51,6 +53,7 @@ function Projectile:Create(_xPos, _yPos, _world, _DirectionX, _DirectionY, _spee
   self.RigidBody:SetGravity(0);
 end
 
+-- Returns the respective on hit sound
 function Projectile:GetOnHitSound()
   if self.Type == "Seed" then
     return nil;
@@ -63,6 +66,7 @@ function Projectile:GetOnHitSound()
   end
 end
 
+-- Creates a pea shot projectile
 function Projectile:CreatePeashot(_xPos, _yPos)
   math.randomseed(os.time());
   local randomSound = math.random(1,2);
@@ -71,6 +75,7 @@ function Projectile:CreatePeashot(_xPos, _yPos)
   self.Sprite:AddAnimation('1-14', 0.05);
 end
 
+-- Creates a tear projectile
 function Projectile:CreateTear(_xPos, _yPos)
   math.randomseed(os.time());
   local randomSound = math.random(1,6);
@@ -79,16 +84,19 @@ function Projectile:CreateTear(_xPos, _yPos)
   self.Sprite:AddAnimation('1-3', 0.1);
 end
 
+-- create a tutorial parry ball
 function Projectile:CreateTutorialBall(_xPos, _yPos)
   self.Sprite:Create("Resources/Textures/Tutorial/ParrySphere.png", _xPos, _yPos, 73 , 71);
   self.Sprite:AddAnimation('1-2', 0.1);
   self.Sprite:AddAnimation('3-4', 0.1);
 end
 
+-- Starts the parry leway timer
 function Projectile:StartParryLeway()
   self.ParryTimer = self.ParryLeway;
 end
 
+-- updates the projectile
 function Projectile:Update(_dt)
   self.AudioManager:Update();
 
@@ -155,10 +163,12 @@ function Projectile:Update(_dt)
   end
 end
 
+-- returns the position of the projectile
 function Projectile:GetPosition()
   return self.RigidBody:GetPosition();
 end
 
+-- cleans up the projectile
 function Projectile:Cleanup()
   self.RigidBody:Destroy();
   self.AudioManager:ForceCleanup();
@@ -166,6 +176,7 @@ function Projectile:Cleanup()
   self.ParticleSystem:Emit();
 end
 
+-- draws the projectile
 function Projectile:Draw()
   if self.Destroy == false then
     self.Sprite:Draw();

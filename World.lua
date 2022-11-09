@@ -10,6 +10,7 @@
 local World = {};
 require("CollisionCallbacks");
 
+-- returns a new world instance
 function World:new(_world)
   _world = _world or {world};
   setmetatable(_world, self);
@@ -17,12 +18,14 @@ function World:new(_world)
   return _world;
 end
 
+-- initializes the world
 function World:InitWorld()
   love.physics.setMeter(64);
   self.world = love.physics.newWorld(0, 40 * love.physics.getMeter(), true);
   self.world:setCallbacks(BeginContact, EndContact, PreSolve, PostSolve);
 end
 
+-- updates the world
 function World:Update(_dt)
   self.world:update(_dt);
 end

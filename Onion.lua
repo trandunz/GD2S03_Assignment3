@@ -9,6 +9,7 @@
 
 local Onion = {};
 
+-- returns a new instance of a Onion enemy
 function Onion:new(_onion)
   _onion = _onion or {Sprite = require("AnimatedSprite"):new(), RigidBody = require("RigidBody"):new(), Health = 100,
   Destroy = false, DamageTimer = 0, DamageInterval = 0.1, AttackTimer = 0, AttackInterval = 0.5, ElapsedTime = 0, AttackIntroTimer = 0.4,
@@ -18,6 +19,7 @@ AudioManager = require("AudioManager"):new(), DeathTimer = 1.5};
   return _onion;
 end
 
+-- initialize the Onion enemy
 function Onion:Create(_xPos, _yPos, _world)
   self.Sprite:Create("Resources/Textures/Onion/Onion_Small.png", _xPos, _yPos, 284 ,328);
   self.Sprite:AddAnimation('1-24', 0.05);
@@ -35,6 +37,7 @@ function Onion:Create(_xPos, _yPos, _world)
   self.AudioManager:CreateSound("OnionRise", "Resources/Sounds/Onion/Rise.wav", true, false);
 end
 
+-- Updates the Onion every frame
 function Onion:Update(_dt)
   self.AudioManager:Update();
   if self.Destroy == false then
@@ -73,6 +76,7 @@ function Onion:Update(_dt)
   end
 end
 
+-- handles the Onion attacking
 function Onion:Attack(_dt)
   if self.Health < 100 and self.Health > 0 then
       self.Sprite.CurrentAnimation = 3;
@@ -94,6 +98,7 @@ function Onion:Attack(_dt)
   end
 end
 
+-- Allows the Onion to take the specified amount of damage
 function Onion:TakeDamage(_amount)
   if self.Health > 0 then
     if self.DamageTimer <= 0 then
@@ -109,11 +114,13 @@ function Onion:TakeDamage(_amount)
   end
 end
 
+-- Cleans up the Onion
 function Onion:Cleanup()
   self.RigidBody:Destroy();
   self.AudioManager:ForceCleanup();
 end
 
+-- draws the Onion
 function Onion:Draw()
   if self.Destroy == false then
     self.Sprite:Draw();

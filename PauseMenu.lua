@@ -11,6 +11,7 @@ local PauseMenu = {};
 
 local GUI = require("GUI");
 
+-- Returns an instance of a pauseMenu
 function PauseMenu:new(_pauseMenu)
   _pauseMenu = _pauseMenu or {AudioManager = require("AudioManager"):new(), MenuSelection = 0, Destroy = false,
 OptionsMenu};
@@ -19,6 +20,7 @@ OptionsMenu};
   return _pauseMenu;
 end
 
+-- Initializes the pauseMenu
 function PauseMenu:Create()
   TimeScale = 0;
   GUI = require("GUI"):new();
@@ -35,6 +37,7 @@ function PauseMenu:Create()
   GUI.Elements.Exit:SetScale(2,2);
 end
 
+-- Updates the pause menu
 function PauseMenu:Update(_dt)
   self.AudioManager:Update();
 
@@ -60,6 +63,7 @@ function PauseMenu:Update(_dt)
   end
 end
 
+-- Recieves key events from love key callback
 function PauseMenu:KeyEvents( key, scancode, isrepeat )
   math.randomseed(os.time());
   local randomSound = math.random(1,3);
@@ -107,6 +111,7 @@ function PauseMenu:KeyEvents( key, scancode, isrepeat )
   end
 end
 
+-- Cleans up the pause Menu
 function PauseMenu:Cleanup()
   TimeScale = 1;
   GUI:Cleanup();
@@ -116,6 +121,7 @@ function PauseMenu:Cleanup()
   end
 end
 
+-- Draws the pause menu
 function PauseMenu:Draw()
     if self.OptionsMenu then
       self.OptionsMenu:Draw();

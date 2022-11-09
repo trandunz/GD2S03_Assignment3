@@ -11,6 +11,7 @@ local MainMenu = {};
 
 local GUI = require("GUI");
 
+-- returns a new instance of main menu
 function MainMenu:new(_mainMenu)
   _mainMenu = _mainMenu or {BG = require("Sprite"):new(), Play = require("Text"):new(),Options = require("Text"):new(),Exit = require("Text"):new(), MenuSelection = 0,
 AudioManager = require("AudioManager"):new(), OptionsMenu};
@@ -19,6 +20,7 @@ AudioManager = require("AudioManager"):new(), OptionsMenu};
   return _mainMenu;
 end
 
+-- cleans up the scene
 function MainMenu:Cleanup()
   self.AudioManager:ForceCleanup();
   GUI:Cleanup();
@@ -29,6 +31,7 @@ function MainMenu:Cleanup()
   end
 end
 
+-- initializes the scene
 function MainMenu:Start()
     GUI = require("GUI"):new()
 
@@ -47,6 +50,7 @@ function MainMenu:Start()
     self.BG:SetScale(1,1);
 end
 
+-- updates the scene
 function MainMenu:Update(_dt)
   LevelLoader:HandleSceneStartTransition(_dt);
 
@@ -74,6 +78,7 @@ function MainMenu:Update(_dt)
   end
 end
 
+-- recieves key events from love key callback
 function MainMenu:KeyEvents( key, scancode, isrepeat )
   math.randomseed(os.time());
   local randomSound = math.random(1,3);
@@ -123,6 +128,7 @@ function MainMenu:KeyEvents( key, scancode, isrepeat )
   end
 end
 
+-- draws the scene
 function MainMenu:Draw()
     self.BG:Draw()
 

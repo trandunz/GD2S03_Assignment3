@@ -9,6 +9,7 @@
 
 local Text = {};
 
+-- returns a new text instance
 function Text:new(_text)
   _text = _text or {Font = "", String, xPos, yPos, xScale = 1, yScale = 1};
   setmetatable(_text, self);
@@ -16,6 +17,7 @@ function Text:new(_text)
   return _text;
 end
 
+-- initializes the text
 function Text:Create(_string, _xPos, _yPos, _align, _angle, _charSize, _r, _g, _b)
   _string = _string or "";
   _xPos = _xPos or 0;
@@ -41,25 +43,30 @@ function Text:Create(_string, _xPos, _yPos, _align, _angle, _charSize, _r, _g, _
   love.graphics.setFont(self.Font);
 end
 
+-- sets the colour of the text
 function Text:SetColor(_r, _g, _b, _a)
   self.R = _r / 255;
   self.G = _g / 255;
   self.B = _b / 255;
 end
 
+-- sets the scale of the text
 function Text:SetScale(_x, _y)
   self.xScale = _x;
   self.yScale = _x;
 end
 
+-- sets the font of the text
 function Text:SetFont(_font)
   self.Font = _font;
 end
 
+-- returns the center position of the text
 function Text:GetCenterPosition()
   return self.xPos - (self.CharSize * string.len (self.String) / 2) * self.xScale;
 end
 
+-- draws the text
 function Text:Draw()
   love.graphics.setColor(self.R, self.G, self.B);
 

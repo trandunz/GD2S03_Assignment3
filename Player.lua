@@ -37,7 +37,7 @@ function Player.Create(_xPos, _yPos, _world)
   Player.ParryableProjectile = nil;
   Player.ParticleSystem = require("ParticleSystem"):new();
 
-  Player.ParticleSystem:Create("Resources/Textures/Peashooter/ExplosionDust.png",10000, _xPos, _yPos);
+  Player.ParticleSystem:Create("Resources/Textures/PeaShooter/ExplosionDust.png",10000, _xPos, _yPos);
 
   Player.Sprite:Create("Resources/Textures/Cuphead/Player_Everything.png", _xPos, _yPos, 326 ,188);
   Player.Sprite:AddAnimation('1-9', 0.059, 0, 0);
